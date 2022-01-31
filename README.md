@@ -37,7 +37,6 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 	* Pushbuttons Configuration
 	* URH Parse example
 	* Other Sketches
-	* Public Demo
 4. Evil Crow RF V2 Support
 
 # Disclaimer
