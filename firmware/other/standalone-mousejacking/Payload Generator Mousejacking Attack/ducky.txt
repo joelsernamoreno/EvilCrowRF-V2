@@ -1,0 +1,5 @@
+GUI r
+STRING cmd
+ENTER
+DELAY 2000
+STRING testing mousejacking
