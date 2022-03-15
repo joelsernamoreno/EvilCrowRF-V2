@@ -19,7 +19,9 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 
 **For Sale at:** 
 
-* Coming soon.
+* Evil Crow RF V2 Aliexpress: https://aliexpress.com/item/1005004019072519.html
+* Evil Crow RF V2 Lite (without NRF2401L) Aliexpress: https://aliexpress.com/item/1005004032930927.html
+* Evil Crow RF V2 Alibaba: https://www.alibaba.com/product-detail/Evil-Crow-RF2-signal-receiver-with_1600467911757.html 
 
 **Discord Group:** https://discord.gg/jECPUtdrnW
 
