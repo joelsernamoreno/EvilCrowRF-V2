@@ -12,16 +12,23 @@
 
 **Manufacturer and distributor:** April Brother (@aprbrother).
 
+**Distributor from United Kingdom:** KSEC Worldwide (@KSEC_KC).
+
 The developers and collaborators of this project do not earn money with this. 
 You can invite me for a coffee to further develop Low-Cost hacking devices. If you don't invite me for a coffee, nothing happens, I will continue developing devices.
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E614OA5)
 
-**For Sale at:** 
+**For sale with April Brother (shipping from China):** 
 
 * Evil Crow RF V2 Aliexpress: https://aliexpress.com/item/1005004019072519.html
 * Evil Crow RF V2 Lite (without NRF2401L) Aliexpress: https://aliexpress.com/item/1005004032930927.html
 * Evil Crow RF V2 Alibaba: https://www.alibaba.com/product-detail/Evil-Crow-RF2-signal-receiver-with_1600467911757.html 
+
+**For sale with KSEC Worldwide (shipping from United Kingdom):**
+
+* Evil Crow RF V2: https://labs.ksec.co.uk/product/evil-crow-rf-v2/
+* Evil Crow RF V2 Lite: https://labs.ksec.co.uk/product/evil-crow-rf2-lite/
 
 **Discord Group:** https://discord.gg/jECPUtdrnW
 
