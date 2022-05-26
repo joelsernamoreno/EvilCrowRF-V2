@@ -45,6 +45,7 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 	* Binary TX Config Example
 	* Pushbuttons Configuration
 	* URH Parse example
+	* Power management
 	* Other Sketches
 4. Evil Crow RF V2 Support
 
@@ -179,6 +180,15 @@ The basic firmware allows to receive and transmit signals. You can configure the
 ## URH Parse example
 
 Demo: https://youtube.com/watch?v=TAgtaAnLL6U
+
+## Power Management
+
+1. In normal mode, press push2 + reset, then release reset: Evil Crow RF v2 blinks several times and goes to sleep. 
+2. In sleep mode, press push2 + reset, then release reset to wake him up.
+
+Demo: https://www.youtube.com/shorts/K_Qkss6-pEY
+
+**NOTE:** If Evil Crow RF v2 is sleeping and you accidentally press reset, he'll go straight back to sleep. If he isn't asleep and you press reset then he will stay awake too.
 
 ## Other Sketches
 
