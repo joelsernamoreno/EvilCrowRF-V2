@@ -45,7 +45,7 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 	* Binary TX Config Example
 	* Pushbuttons Configuration
 	* URH Parse example
-        * OTA Update
+	* OTA Update
 	* Power management
 	* Other Sketches
 4. Evil Crow RF V2 Support
