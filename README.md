@@ -45,6 +45,7 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 	* Binary TX Config Example
 	* Pushbuttons Configuration
 	* URH Parse example
+        * OTA Update
 	* Power management
 	* Other Sketches
 4. Evil Crow RF V2 Support
@@ -97,24 +98,25 @@ The basic firmware allows to receive and transmit signals. You can configure the
 3. Download and Install the Arduino IDE: https://www.arduino.cc/en/main/software
 4. Download Evil Crow RF V2 repository: git clone https://github.com/joelsernamoreno/EvilCrowRF-V2.git
 5. Download the ESPAsyncWebServer library in the Arduino library directory: git clone https://github.com/me-no-dev/ESPAsyncWebServer.git
-6. Download the AsyncTCP library in the Arduino library directory: git clone https://github.com/me-no-dev/AsyncTCP.git
-7. Edit AsyncTCP/src/AsyncTCP.h and change the following:
+6. Download the AsyncElegantOTA library in the Arduino library directory: git clone https://github.com/ayushsharma82/AsyncElegantOTA.git
+7. Download the AsyncTCP library in the Arduino library directory: git clone https://github.com/me-no-dev/AsyncTCP.git
+8. Edit AsyncTCP/src/AsyncTCP.h and change the following:
 
 * #define CONFIG_ASYNC_TCP_USE_WDT 1 to #define CONFIG_ASYNC_TCP_USE_WDT 0 
 
-8. Open Arduino IDE
-9. Go to File - Preferences. Locate the field "Additional Board Manager URLs:" Add "https://dl.espressif.com/dl/package_esp32_index.json" without quotes. Click "Ok"
-10. Select Tools - Board - Boards Manager. Search for "esp32". Install "esp32 by Espressif system version 1.0.6". Click "Close".
-11. Open the EvilCrowRF-V2/firmware/v1.0/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
-12. Select Tools:
+9. Open Arduino IDE
+10. Go to File - Preferences. Locate the field "Additional Board Manager URLs:" Add "https://dl.espressif.com/dl/package_esp32_index.json" without quotes. Click "Ok"
+11. Select Tools - Board - Boards Manager. Search for "esp32". Install "esp32 by Espressif system version 1.0.6". Click "Close".
+12. Open the EvilCrowRF-V2/firmware/v1.3/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
+13. Select Tools:
     * Board - "ESP32 Dev Module".
     * Flash Size - "4MB (32Mb)".
     * CPU Frequency - "80MHz (WiFi/BT)".
     * Flash Frequency - "40MHz"
     * Flash Mode - "DIO"
-13. Upload the code to the Evil Crow RF V2 device
-14. Copy the EvilCrowRF-V2/firmware/v1.0/SD/HTML folder to a MicroSD card.
-15. Copy the EvilCrowRF-V2/firmware/v1.0/SD/URH folder to a MicroSD card.
+14. Upload the code to the Evil Crow RF V2 device
+15. Copy the EvilCrowRF-V2/firmware/v1.0/SD/HTML folder to a MicroSD card.
+16. Copy the EvilCrowRF-V2/firmware/v1.0/SD/URH folder to a MicroSD card.
 
 ![SD](https://github.com/joelsernamoreno/EvilCrowRF-V2/blob/main/images/sd.png)
 
@@ -180,6 +182,10 @@ The basic firmware allows to receive and transmit signals. You can configure the
 ## URH Parse example
 
 Demo: https://youtube.com/watch?v=TAgtaAnLL6U
+
+## OTA Update
+
+Demo: https://www.youtube.com/watch?v=R0Mw3-EsuQA
 
 ## Power Management
 
