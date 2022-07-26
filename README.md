@@ -94,6 +94,8 @@ The basic firmware allows to receive and transmit signals. You can configure the
 
 ## Installation
 
+**You must copy the files to the SD card or your Evil Crow WILL NOT WORK.**
+
 1. Install esptool: sudo apt install esptool
 2. Install pyserial: sudo pip install pyserial
 3. Download and Install the Arduino IDE: https://www.arduino.cc/en/main/software
@@ -122,7 +124,23 @@ The basic firmware allows to receive and transmit signals. You can configure the
 
 ![SD](https://github.com/joelsernamoreno/EvilCrowRF-V2/blob/main/images/sd.png)
 
+## Troubleshooting
+
+*Web server will not load, is a blank page or displays nothing*
+
+Check you have copied the relevant files to the SD card and the SD card is inserted in the Evil Crow device. Check you are connected to the Wifi Access Point of the Evil Crow
+
+*My files are on the SD card but the web server will not work*
+
+Check your SD card size. It is recommended to use a small card. 32GB or smaller is sufficent for operation. Cards larger than this have been shown to cause issues and not work.
+
+*I cannot access the internet when I am connected to the Evil Crow*
+
+By default, the Evil Crow operates as an access point. When you connect to it, it has no internet access as it is not connected to the internet. If you require internet access at the same time, you will need to alter the code of the Evil Crow to connect to your Wifi, and from there, you can connect to the Evil Crow.
+
 ## First steps with Evil Crow RF V2
+
+# Check & verify you have copied the relevant files to your SD card. See above for details
 
 1. Insert the MicroSD card into the Evil Crow RF V2 and connect the device to an external battery or laptop.
 2. Visualize the wifi networks around you and connect to the Evil Crow RF V2 (default SSID: Evil Crow RF v2).
