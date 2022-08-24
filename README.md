@@ -47,6 +47,7 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 	* Tesla Charge Door Opener
 	* URH Parse example
 	* OTA Update
+	* Wi-Fi Config
 	* Power management
 	* Other Sketches
 4. Evil Crow RF V2 Support
@@ -109,7 +110,7 @@ The basic firmware allows to receive and transmit signals. You can configure the
 10. Open Arduino IDE
 11. Go to File - Preferences. Locate the field "Additional Board Manager URLs:" Add "https://dl.espressif.com/dl/package_esp32_index.json" without quotes. Click "Ok"
 12. Select Tools - Board - Boards Manager. Search for "esp32". Install "esp32 by Espressif system version 1.0.6". Click "Close".
-13. Open the EvilCrowRF-V2/firmware/v1.3.1/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
+13. Open the EvilCrowRF-V2/firmware/v1.3.2/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
 14. Select Tools:
     * Board - "ESP32 Dev Module".
     * Flash Size - "4MB (32Mb)".
@@ -117,13 +118,28 @@ The basic firmware allows to receive and transmit signals. You can configure the
     * Flash Frequency - "40MHz"
     * Flash Mode - "DIO"
 15. Upload the code to the Evil Crow RF V2 device
-16. Copy the EvilCrowRF-V2/firmware/v1.3.1/SD/HTML folder to a MicroSD card.
-17. Copy the EvilCrowRF-V2/firmware/v1.3.1/SD/URH folder to a MicroSD card.
+16. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/HTML folder to a MicroSD card.
+17. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/URH folder to a MicroSD card.
 
 ![SD](https://github.com/joelsernamoreno/EvilCrowRF-V2/blob/main/images/sd.png)
 
+**Notes about SD:** 
+
+* Web server will not load, is a blank page or displays nothing:
+
+Check you have copied the relevant files to the SD card and the SD card is inserted in the Evil Crow RF V2 device. Check you are connected to the Wifi Access Point of the Evil Crow RF V2.
+
+* My files are on the SD card but the web server will not work:
+
+Check your SD card size. It is recommended to use a small card. 32GB or smaller is sufficent for operation. Cards larger than this have been shown to cause issues and not work.
+
+* I cannot access the internet when I am connected to the Evil Crow RF V2:
+
+By default, the Evil Crow operates as an access point. When you connect to it, it has no internet access as it is not connected to the internet. If you need internet at the same time, read the Wi-Fi Config section of this repository to configure Evil Crow RF V2 in STATION mode.
+
 ## First steps with Evil Crow RF V2
 
+0. Check & verify you have copied the relevant files to your SD card.
 1. Insert the MicroSD card into the Evil Crow RF V2 and connect the device to an external battery or laptop.
 2. Visualize the wifi networks around you and connect to the Evil Crow RF V2 (default SSID: Evil Crow RF v2).
 3. Enter the password for the wifi network (default password: 123456789).
@@ -142,6 +158,16 @@ The basic firmware allows to receive and transmit signals. You can configure the
 * Data rate: (example 5)
 
 ![RX](https://github.com/joelsernamoreno/EvilCrowRF-V2/blob/main/images/rx.png)
+
+**2-FSK NOTES:**
+
+* Evil Crow RF V2 allows 2-FSK (RX/TX) modulation, this is configured for use with CC1101 module 2. Do not use CC1101 module 1 for 2-FSK. 
+
+* You can use 2-FSK TX with module 1 or with module 2. 
+
+* Evil Crow RF V2 allows you to receive signals at the same time on two different frequencies, but this does not work correctly if you use 2-FSK. Make sure you use module 2 for 2-FSK RX, while doing this do not use module 1 for anything or you will not receive the 2-FSK signals correctly. 
+
+* You can receive two signals on different frequencies with ASK/OOK.
 
 ## RX Log Example
 
@@ -192,6 +218,14 @@ Demo: https://youtube.com/watch?v=TAgtaAnLL6U
 ## OTA Update
 
 Demo: https://www.youtube.com/watch?v=YQFNLyHu42A
+
+## WiFi Config
+
+Evil Crow RF V2 is configured in AP mode with a default SSID and password. You can change the mode to STATION or AP, change SSID, change password and change Wi-Fi channel remotely from the web panel.
+
+The changes will be stored in the device, every time you restart Evil Crow Cable RF V2 the new Wi-Fi settings will be applied. If you want to return to the default settings, you can delete the stored Wi-Fi configuration from the web panel.
+
+**NOTE:** When changing the Wi-Fi configuration you have to fill in all the fields correctly, if you do not do this you bricked the device.
 
 ## Power Management
 
