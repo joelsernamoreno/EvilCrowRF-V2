@@ -223,7 +223,7 @@ Demo: https://www.youtube.com/watch?v=YQFNLyHu42A
 
 Evil Crow RF V2 is configured in AP mode with a default SSID and password. You can change the mode to STATION or AP, change SSID, change password and change Wi-Fi channel remotely from the web panel.
 
-The changes will be stored in the device, every time you restart Evil Crow Cable RF V2 the new Wi-Fi settings will be applied. If you want to return to the default settings, you can delete the stored Wi-Fi configuration from the web panel.
+The changes will be stored in the device, every time you restart Evil Crow RF V2 the new Wi-Fi settings will be applied. If you want to return to the default settings, you can delete the stored Wi-Fi configuration from the web panel.
 
 **NOTE:** When changing the Wi-Fi configuration you have to fill in all the fields correctly, if you do not do this you bricked the device.
 
