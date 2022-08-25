@@ -161,7 +161,7 @@ By default, the Evil Crow operates as an access point. When you connect to it, i
 
 **2-FSK NOTES:**
 
-* Evil Crow RF V2 allows 2-FSK (RX/TX) modulation, this is configured for use with CC1101 module 2. Do not use CC1101 module 1 for 2-FSK. 
+* Evil Crow RF V2 allows 2-FSK (RX/TX) modulation, this is configured for use with CC1101 module 2. Do not use CC1101 module 1 for 2-FSK RX. 
 
 * You can use 2-FSK TX with module 1 or with module 2. 
 
