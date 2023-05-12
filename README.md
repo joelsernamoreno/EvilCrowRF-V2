@@ -6,7 +6,7 @@
 
 **Main collaborator:** Little Satan (https://github.com/LSatan/)
 
-**Other collaborators:** Eduardo Blázquez (@_eblazquez), Federico Maggi (@phretor), Andrea Guglielmini (@Guglio95) and RFQuack (@rfquack).
+**Other collaborators:** Jordi Castelló (@iordic), Eduardo Blázquez (@_eblazquez), Federico Maggi (@phretor), Andrea Guglielmini (@Guglio95) and RFQuack (@rfquack).
 
 **PCB design:** Ignacio Díaz Álvarez (@Nacon_96), Forensic Security (@ForensicSec) and April Brother (@aprbrother).
 
