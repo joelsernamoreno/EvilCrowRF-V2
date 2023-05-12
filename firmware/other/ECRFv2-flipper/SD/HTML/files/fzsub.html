@@ -1,0 +1,90 @@
+<html>
+
+<head>
+  <title>Flipper Zero TX</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../style.css">
+  <script src="../lib.js"></script>
+  <script>
+    window.onload = (event) => {
+      var xmlhttp = new XMLHttpRequest();
+      xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+          var files = JSON.parse(this.responseText);
+          var fileSelector = document.getElementById("file-selector");
+
+          for (const file of files) {
+            if (file['type'] == "file") {
+              let option = document.createElement('option');
+              option.value = file['name'];
+              option.innerHTML = file['name'].substring(file['name'].lastIndexOf('/') + 1);
+              fileSelector.append(option);                   
+            }
+          }
+        }
+      };
+      xmlhttp.open("GET", "/files?path=/DATA/FZSUB", true);
+      xmlhttp.send();
+    }
+  </script>
+</head>
+<body>
+
+  <nav id='menu'>
+    <input type='checkbox' id='responsive-menu' onclick='updatemenu()'><label></label>
+    <ul>
+      <li><a href='/'>Home</a></li>
+      <li><a class='dropdown-arrow'>Config</a>
+        <ul class='sub-menus'>
+          <li><a href='../config/buttons.html'>Buttons</a></li>
+          <li><a href='../config/rx.html'>RX</a></li>
+          <li><a href='../config/wifi.html'>WiFi</a></li>
+        </ul>
+      </li>
+      <li><a class='dropdown-arrow'>RX Log</a>
+        <ul class='sub-menus'>
+          <li><a href='../logs.txt'>RX Logs</a></li>
+          <li><a href='../delete'>Delete Logs</a></li>
+          <li><a href='../downloadlog'>Download Logs</a></li>
+          <li><a href='../cleanspiffs'>Clean SPIFFS</a></li>
+        </ul>
+      </li>
+      <li><a class='dropdown-arrow'>Transmit</a>
+        <ul class='sub-menus'>
+          <li><a href='../transmit/txraw.html'>Raw</a></li>
+          <li><a href='../transmit/txbinary.html'>Binary</a></li>
+          <li><a href='../transmit/txtesla.html'>Tesla charger</a></li>
+        </ul>
+      </li>
+      <li><a class='dropdown-arrow'>TX Files</a>
+        <ul class='sub-menus'>
+          <li><a href='../files/manage.html'>Manage</a></li>
+          <li><a href='../files/urh.html'>URH</a></li>
+          <li><a href='../files/fzsub.html'>FZ Sub</a></li>
+        </ul>
+      </li>
+      <li><a href='../jammer.html'>Jammer</a></li>
+      <li><a class='dropdown-arrow'>OTA</a>
+        <ul class='sub-menus'>
+          <li><a href='../update'>Firmware</a></li>
+          <li><a href='../updatesd.html'>SD Files</a></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
+  <br>
+  <FORM action="/transmit/file/fz" method="post" id="config" target="iframe">
+    <p>SUB file: </p>
+    <label class="custom-select" for="styledSelect1">
+      <select id="file-selector" form="config"  name="filepath"><option value="">--select file--</option></select>
+    </label>    
+    <hr>
+    <INPUT type="radio" name="configmodule" value="4" hidden="1" checked="checked">
+    <INPUT class="button-submit" type="submit" value="Transmit">
+  </form>
+  <br>
+  <hr>
+  <br>
+  <iframe style="visibility: hidden;" src="http://" )+local_IPstr+"/settxprotocol" name="iframe"></iframe>
+</body>
+</html>

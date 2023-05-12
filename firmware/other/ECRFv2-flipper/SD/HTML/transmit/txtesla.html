@@ -1,0 +1,74 @@
+<html>
+
+<head>
+  <title>Tesla Charge Door TX</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="../style.css">
+  <script src="../lib.js"></script>
+</head>
+
+<body>
+
+  <body>
+    <nav id='menu'>
+      <input type='checkbox' id='responsive-menu' onclick='updatemenu()'><label></label>
+      <ul>
+        <li><a href='/'>Home</a></li>
+        <li><a class='dropdown-arrow'>Config</a>
+          <ul class='sub-menus'>
+            <li><a href='../config/buttons.html'>Buttons</a></li>
+            <li><a href='../config/rx.html'>RX</a></li>
+            <li><a href='../config/wifi.html'>WiFi</a></li>
+          </ul>
+        </li>
+        <li><a class='dropdown-arrow'>RX Log</a>
+          <ul class='sub-menus'>
+            <li><a href='../logs.txt'>RX Logs</a></li>
+            <li><a href='../delete'>Delete Logs</a></li>
+            <li><a href='../downloadlog'>Download Logs</a></li>
+            <li><a href='../cleanspiffs'>Clean SPIFFS</a></li>
+          </ul>
+        </li>
+        <li><a class='dropdown-arrow'>Transmit</a>
+          <ul class='sub-menus'>
+            <li><a href='../transmit/txraw.html'>Raw</a></li>
+            <li><a href='../transmit/txbinary.html'>Binary</a></li>
+            <li><a href='../transmit/txtesla.html'>Tesla charger</a></li>
+          </ul>
+        </li>
+        <li><a class='dropdown-arrow'>TX Files</a>
+          <ul class='sub-menus'>
+            <li><a href='../files/manage.html'>Manage</a></li>
+            <li><a href='../files/urh.html'>URH</a></li>
+            <li><a href='../files/fzsub.html'>FZ Sub</a></li>
+          </ul>
+        </li>
+        <li><a href='../jammer.html'>Jammer</a></li>
+        <li><a class='dropdown-arrow'>OTA</a>
+          <ul class='sub-menus'>
+            <li><a href='../update'>Firmware</a></li>
+            <li><a href='../updatesd.html'>SD Files</a></li>
+          </ul>
+        </li>
+      </ul>
+    </nav>
+    <br>
+    <FORM action="/transmit/tesla" method="post" id="config" target="iframe">
+      <p>Frequency: </p>
+      <label class="custom-select" for="styledSelect1">
+        <select name="frequency" form="config" id="styledSelect1">
+          <option value="433.92">433.92 MHz</option>
+          <option value="315.00">315 MHz</option>
+        </select>
+      </label>
+      <hr>
+      <INPUT type="radio" name="configmodule" value="0" hidden="1" checked="checked">
+      <INPUT class="button-submit" type="submit" value="Transmit">
+    </form>
+    <br>
+    <hr>
+    <br>
+    <iframe style="visibility: hidden;" src="http://" )+local_IPstr+"/settxtesla" name="iframe"></iframe>
+  </body>
+
+</html>
