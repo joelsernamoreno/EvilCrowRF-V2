@@ -30,7 +30,7 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 * Evil Crow RF V2: https://labs.ksec.co.uk/product/evil-crow-rf-v2/
 * Evil Crow RF V2 Lite: https://labs.ksec.co.uk/product/evil-crow-rf2-lite/
 
-**Discord Group:** https://discord.gg/jECPUtdrnW
+**Discord Group:** https://discord.gg/evilcrowrf
 
 **Summary:**
 
