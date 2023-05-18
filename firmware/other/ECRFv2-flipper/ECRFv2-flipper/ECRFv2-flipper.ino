@@ -1,11 +1,11 @@
 #include "config.h"
+
 #include "ELECHOUSE_CC1101_SRC_DRV.h"
 #include <WiFiClient.h> 
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
-#define DEST_FS_USES_SD
 #include <ESP32-targz.h>
 #include <SPIFFSEditor.h>
 #include <EEPROM.h>
@@ -16,6 +16,7 @@
 #include "SD.h"
 #include "AsyncJson.h"
 #include "ArduinoJson.h"  // install from library manager
+
 
 #define signalstorage 10
 
@@ -951,8 +952,19 @@ void setup() {
     }
   });
 
-  controlserver.on("/viewlog", HTTP_GET, [](AsyncWebServerRequest *request){
+  controlserver.on("/logview", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SD, "/logs.txt", "text/html");
+  });
+
+  controlserver.on("/logdownload", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SD, "/logs.txt", String(), true);
+  });
+
+  controlserver.on("/logdelete", HTTP_GET, [](AsyncWebServerRequest *request){
+    deleteFile(SD, "/logs.txt");
+    request->send(200, "text/html", HTML_CSS_STYLING+ "<body onload=\"JavaScript:AutoRedirect()\">"
+    "<br><h2>File cleared!<br>You will be redirected in 5 seconds.</h2></body>");
+    appendFile(SD, "/logs.txt","Viewlog:\n", "<br>\n");
   });
 
   controlserver.on("/cleanspiffs", HTTP_GET, [](AsyncWebServerRequest *request){
@@ -961,16 +973,6 @@ void setup() {
     "<br><h2>SPIFFS cleared!<br>You will be redirected in 5 seconds.</h2></body>" );
   });
 
-  controlserver.on("/downloadlog", HTTP_GET, [](AsyncWebServerRequest *request){
-    request->send(SD, "/logs.txt", String(), true);
-  });
-
-  controlserver.on("/delete", HTTP_GET, [](AsyncWebServerRequest *request){
-    deleteFile(SD, "/logs.txt");
-    request->send(200, "text/html", HTML_CSS_STYLING+ "<body onload=\"JavaScript:AutoRedirect()\">"
-    "<br><h2>File cleared!<br>You will be redirected in 5 seconds.</h2></body>");
-    appendFile(SD, "/logs.txt","Viewlog:\n", "<br>\n");
-  });
 
   controlserver.on("/setwificonfig", HTTP_POST, [](AsyncWebServerRequest *request) {
     String ssid_value = request->arg("ssid");
