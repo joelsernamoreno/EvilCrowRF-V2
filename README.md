@@ -14,16 +14,16 @@
 
 **Distributor from United Kingdom:** KSEC Worldwide (@KSEC_KC).
 
-The developers and collaborators of this project do not earn money with this. 
+The developers and collaborators of this project do not earn money with this.
 You can invite me for a coffee to further develop Low-Cost hacking devices. If you don't invite me for a coffee, nothing happens, I will continue developing devices.
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E614OA5)
 
-**For sale with April Brother (shipping from China):** 
+**For sale with April Brother (shipping from China):**
 
 * Evil Crow RF V2 Aliexpress: https://aliexpress.com/item/1005004032930927.html
 * Evil Crow RF V2 Lite (without NRF2401L) Aliexpress: https://aliexpress.com/item/1005004032930927.html
-* Evil Crow RF V2 Alibaba: https://www.alibaba.com/product-detail/Evil-Crow-RF2-signal-receiver-with_1600467911757.html 
+* Evil Crow RF V2 Alibaba: https://www.alibaba.com/product-detail/Evil-Crow-RF2-signal-receiver-with_1600467911757.html
 
 **For sale with KSEC Worldwide (shipping from United Kingdom):**
 
@@ -84,7 +84,7 @@ Evil Crow RF V2 allows the following attacks:
 * Mousejacking
 * ...
 
-**NOTE:** 
+**NOTE:**
 
 * All devices have been flashed with basic firmware Evil Crow RF V2 before shipping.
 * Please do not ask me to implement new functions in this code. You can develop code for Evil Crow RF V2 and send PR with your new code.
@@ -95,35 +95,37 @@ The basic firmware allows to receive and transmit signals. You can configure the
 
 ## Installation
 
-1. Install esptool: sudo apt install esptool
-2. Install pyserial: sudo pip install pyserial
-3. Download and Install the Arduino IDE: https://www.arduino.cc/en/main/software
-4. Download Evil Crow RF V2 repository: git clone https://github.com/joelsernamoreno/EvilCrowRF-V2.git
-5. Download the ESPAsyncWebServer library in the Arduino library directory: git clone https://github.com/me-no-dev/ESPAsyncWebServer.git
-6. Download the AsyncElegantOTA library in the Arduino library directory: git clone https://github.com/ayushsharma82/AsyncElegantOTA.git
-7. Download the ESP32-targz library in the Arduino library directory: git clone https://github.com/tobozo/ESP32-targz.git
-8. Download the AsyncTCP library in the Arduino library directory: git clone https://github.com/me-no-dev/AsyncTCP.git
-9. Edit AsyncTCP/src/AsyncTCP.h and change the following:
+1. Install esptool: `sudo apt install esptool`
+2. Install pyserial: `sudo pip install pyserial`
+3. Download and Install the **Arduino IDE**: https://www.arduino.cc/en/main/software
+4. Download **Evil Crow RF V2 repository**: `git clone https://github.com/joelsernamoreno/EvilCrowRF-V2.git`
+5. Download the **ESPAsyncWebServer** library in the Arduino library directory: `git clone https://github.com/me-no-dev/ESPAsyncWebServer.git`
+   **NOTE:** Arduino library directory in GNU/Linux (default) are: `~/Arduino/libraries`
+6. Download the **AsyncElegantOTA** library in the Arduino library directory: `git clone https://github.com/ayushsharma82/AsyncElegantOTA.git`
+7. Download the **ESP32-targz** library in the Arduino library directory: `git clone https://github.com/tobozo/ESP32-targz.git`
+8. Download the **AsyncTCP** library in the Arduino library directory: `git clone https://github.com/me-no-dev/AsyncTCP.git`
+9.  Edit `AsyncTCP/src/AsyncTCP.h` and change the following:
 
-* #define CONFIG_ASYNC_TCP_USE_WDT 1 to #define CONFIG_ASYNC_TCP_USE_WDT 0 
+* `#define CONFIG_ASYNC_TCP_USE_WDT 1` to `#define CONFIG_ASYNC_TCP_USE_WDT 0`
 
 10. Open Arduino IDE
-11. Go to File - Preferences. Locate the field "Additional Board Manager URLs:" Add "https://dl.espressif.com/dl/package_esp32_index.json" without quotes. Click "Ok"
-12. Select Tools - Board - Boards Manager. Search for "esp32". Install "esp32 by Espressif system version 1.0.6". Click "Close".
-13. Open the EvilCrowRF-V2/firmware/v1.3.2/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
-14. Select Tools:
-    * Board - "ESP32 Dev Module".
+11. Go to menu "File" > "Preferences..." > Locate the field "Additional board manager URLs:" Add `https://dl.espressif.com/dl/package_esp32_index.json` > Click "Ok"
+12. Go to menu "Tools" > "Board" > "Boards Manager..." Search for `esp32`. Install "esp32 by Espressif system version 1.0.6". Click "Close".
+13. Open the `EvilCrowRF-V2/firmware/v1.3.2/EvilCrow-RFv2/EvilCrow-RFv2.ino` sketch
+14. Go to menu "Tools":
+    * "Board" - esp32" > "ESP32 Dev Module".
     * Flash Size - "4MB (32Mb)".
     * CPU Frequency - "80MHz (WiFi/BT)".
     * Flash Frequency - "40MHz"
     * Flash Mode - "DIO"
-15. Upload the code to the Evil Crow RF V2 device
-16. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/HTML folder to a MicroSD card.
-17. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/URH folder to a MicroSD card.
+15. Go to menu "Tools" > "Port" > "/dev/ttyUSB0"
+16. Upload the code to the Evil Crow RF V2 device: Go to menu "Sketch" > "Upload"
+17. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/HTML folder to a MicroSD card.
+18. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/URH folder to a MicroSD card.
 
 ![SD](https://github.com/joelsernamoreno/EvilCrowRF-V2/blob/main/images/sd.png)
 
-**Notes about SD:** 
+**Notes about SD:**
 
 * Web server will not load, is a blank page or displays nothing:
 
@@ -141,9 +143,9 @@ By default, the Evil Crow operates as an access point. When you connect to it, i
 
 0. Check & verify you have copied the relevant files to your SD card.
 1. Insert the MicroSD card into the Evil Crow RF V2 and connect the device to an external battery or laptop.
-2. Visualize the wifi networks around you and connect to the Evil Crow RF V2 (default SSID: Evil Crow RF v2).
-3. Enter the password for the wifi network (default password: 123456789).
-4. Open a browser and access the web panel (default IP: 192.168.4.1).
+2. Visualize the wifi networks around you and connect to the Evil Crow RF V2 (default SSID: `Evil Crow RF v2`).
+3. Enter the password for the wifi network (default password: **`123456789`**).
+4. Open a browser and access the web panel (default IP: `192.168.4.1`).
 5. Go!
 
 ![Webpanel](https://github.com/joelsernamoreno/EvilCrowRF-V2/blob/main/images/webpanel.png)
@@ -161,11 +163,11 @@ By default, the Evil Crow operates as an access point. When you connect to it, i
 
 **2-FSK NOTES:**
 
-* Evil Crow RF V2 allows 2-FSK (RX/TX) modulation, this is configured for use with CC1101 module 2. Do not use CC1101 module 1 for 2-FSK RX. 
+* Evil Crow RF V2 allows 2-FSK (RX/TX) modulation, this is configured for use with CC1101 module 2. Do not use CC1101 module 1 for 2-FSK RX.
 
-* You can use 2-FSK TX with module 1 or with module 2. 
+* You can use 2-FSK TX with module 1 or with module 2.
 
-* Evil Crow RF V2 allows you to receive signals at the same time on two different frequencies, but this does not work correctly if you use 2-FSK. Make sure you use module 2 for 2-FSK RX, while doing this do not use module 1 for anything or you will not receive the 2-FSK signals correctly. 
+* Evil Crow RF V2 allows you to receive signals at the same time on two different frequencies, but this does not work correctly if you use 2-FSK. Make sure you use module 2 for 2-FSK RX, while doing this do not use module 1 for anything or you will not receive the 2-FSK signals correctly.
 
 * You can receive two signals on different frequencies with ASK/OOK.
 
@@ -229,7 +231,7 @@ The changes will be stored in the device, every time you restart Evil Crow RF V2
 
 ## Power Management
 
-1. In normal mode, press push2 + reset, then release reset: Evil Crow RF v2 blinks several times and goes to sleep. 
+1. In normal mode, press push2 + reset, then release reset: Evil Crow RF v2 blinks several times and goes to sleep.
 2. In sleep mode, press push2 + reset, then release reset to wake him up.
 
 Demo: https://www.youtube.com/shorts/K_Qkss6-pEY
@@ -245,4 +247,3 @@ Demo: https://www.youtube.com/shorts/K_Qkss6-pEY
 
 * You can ask in the Discord group: https://discord.gg/jECPUtdrnW
 * You can open issue or send me a message via twitter (@JoelSernaMoreno).
-
