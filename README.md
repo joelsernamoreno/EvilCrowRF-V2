@@ -21,9 +21,11 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 
 **For sale with April Brother (shipping from China):** 
 
-* Evil Crow RF V2 Aliexpress: https://aliexpress.com/item/1005004032930927.html
-* Evil Crow RF V2 Lite (without NRF2401L) Aliexpress: https://aliexpress.com/item/1005004032930927.html
+* Evil Crow RF V2 Tindie: https://www.tindie.com/products/aprbrother/evil-crow-rf-v2-rf-transceiver-rf/
+
 * Evil Crow RF V2 Alibaba: https://www.alibaba.com/product-detail/Evil-Crow-RF2-signal-receiver-with_1600467911757.html 
+
+* Evil Crow RF V2 Aliexpress: https://www.aliexpress.com/item/3256807682636637.html (**NOTE:** The Aliexpress link isn't working for users in Europe.)
 
 **For sale with KSEC Worldwide (shipping from United Kingdom):**
 
@@ -97,20 +99,24 @@ The basic firmware allows to receive and transmit signals. You can configure the
 
 1. Install esptool: sudo apt install esptool
 2. Install pyserial: sudo pip install pyserial
-3. Download and Install the Arduino IDE: https://www.arduino.cc/en/main/software
+3. Download and install the latest version of Arduino IDE (v2.3.3): https://www.arduino.cc/en/main/software
 4. Download Evil Crow RF V2 repository: git clone https://github.com/joelsernamoreno/EvilCrowRF-V2.git
 5. Download the ESPAsyncWebServer library in the Arduino library directory: git clone https://github.com/me-no-dev/ESPAsyncWebServer.git
-6. Download the AsyncElegantOTA library in the Arduino library directory: git clone https://github.com/ayushsharma82/AsyncElegantOTA.git
-7. Download the ESP32-targz library in the Arduino library directory: git clone https://github.com/tobozo/ESP32-targz.git
-8. Download the AsyncTCP library in the Arduino library directory: git clone https://github.com/me-no-dev/AsyncTCP.git
-9. Edit AsyncTCP/src/AsyncTCP.h and change the following:
+6. Download the ElegantOTA library in the Arduino library directory: git clone https://github.com/ayushsharma82/ElegantOTA.git
+7. Edit ElegantOTA/src/ElegantOTA.h and chage the following:
+
+* #define ELEGANTOTA_USE_ASYNC_WEBSERVER 0 to #define ELEGANTOTA_USE_ASYNC_WEBSERVER 1
+
+8. Download the ESP32-targz library in the Arduino library directory: git clone https://github.com/tobozo/ESP32-targz.git
+9. Download the AsyncTCP library in the Arduino library directory: git clone https://github.com/me-no-dev/AsyncTCP.git
+10. Edit AsyncTCP/src/AsyncTCP.h and change the following:
 
 * #define CONFIG_ASYNC_TCP_USE_WDT 1 to #define CONFIG_ASYNC_TCP_USE_WDT 0 
 
-10. Open Arduino IDE
-11. Go to File - Preferences. Locate the field "Additional Board Manager URLs:" Add "https://dl.espressif.com/dl/package_esp32_index.json" without quotes. Click "Ok"
-12. Select Tools - Board - Boards Manager. Search for "esp32". Install "esp32 by Espressif system version 1.0.6". Click "Close".
-13. Open the EvilCrowRF-V2/firmware/v1.3.2/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
+11. Open Arduino IDE
+12. Go to File - Preferences. Locate the field "Additional Board Manager URLs:" Add "https://espressif.github.io/arduino-esp32/package_esp32_index.json" without quotes. Click "Ok"
+13. Select Tools - Board - Boards Manager. Search for "esp32". Install "esp32 by Espressif system version 3.0.5". Click "Close".
+13. Open the EvilCrowRF-V2/firmware/v1.3.3/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
 14. Select Tools:
     * Board - "ESP32 Dev Module".
     * Flash Size - "4MB (32Mb)".
@@ -118,8 +124,8 @@ The basic firmware allows to receive and transmit signals. You can configure the
     * Flash Frequency - "40MHz"
     * Flash Mode - "DIO"
 15. Upload the code to the Evil Crow RF V2 device
-16. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/HTML folder to a MicroSD card.
-17. Copy the EvilCrowRF-V2/firmware/v1.3.2/SD/URH folder to a MicroSD card.
+16. Copy the EvilCrowRF-V2/firmware/v1.3.3/SD/HTML folder to a MicroSD card.
+17. Copy the EvilCrowRF-V2/firmware/v1.3.3/SD/URH folder to a MicroSD card.
 
 ![SD](https://github.com/joelsernamoreno/EvilCrowRF-V2/blob/main/images/sd.png)
 
@@ -142,7 +148,7 @@ By default, the Evil Crow operates as an access point. When you connect to it, i
 0. Check & verify you have copied the relevant files to your SD card.
 1. Insert the MicroSD card into the Evil Crow RF V2 and connect the device to an external battery or laptop.
 2. Visualize the wifi networks around you and connect to the Evil Crow RF V2 (default SSID: Evil Crow RF v2).
-3. Enter the password for the wifi network (default password: 123456789).
+3. Enter the password for the wifi network (default password: 123456789ECRFv2).
 4. Open a browser and access the web panel (default IP: 192.168.4.1).
 5. Go!
 
