@@ -19,15 +19,17 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/E1E614OA5)
 
-**For sale with April Brother (shipping from China):** 
+**Available with April Brother (shipping from China):** 
 
 * Evil Crow RF V2 Tindie: https://www.tindie.com/products/aprbrother/evil-crow-rf-v2-rf-transceiver-rf/
-
 * Evil Crow RF V2 Alibaba: https://www.alibaba.com/product-detail/Evil-Crow-RF2-signal-receiver-with_1600467911757.html 
+* Evil Crow RF V2 Aliexpress: https://www.aliexpress.com/item/3256807682636637.html
 
-* Evil Crow RF V2 Aliexpress: https://www.aliexpress.com/item/3256807682636637.html (**NOTE:** The Aliexpress link isn't working for users in Europe.)
+**Available with SAPSAN Cybersec & Military (shipping from EU, Poland):**
 
-**For sale with KSEC Worldwide (shipping from United Kingdom):**
+* https://sapsan-sklep.pl/en/products/evil-crow-rf-v2
+
+**Available with KSEC Worldwide (shipping from United Kingdom):**
 
 * Evil Crow RF V2: https://labs.ksec.co.uk/product/evil-crow-rf-v2/
 * Evil Crow RF V2 Lite: https://labs.ksec.co.uk/product/evil-crow-rf2-lite/
