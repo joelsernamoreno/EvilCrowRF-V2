@@ -34,6 +34,10 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 * Evil Crow RF V2: https://labs.ksec.co.uk/product/evil-crow-rf-v2/
 * Evil Crow RF V2 Lite: https://labs.ksec.co.uk/product/evil-crow-rf2-lite/
 
+**Available with Tienda Espía (shipping from Mexico):**
+
+* https://tiendaespia.com.mx/producto/evil-crow-rf-v2-radiofrequency-hacking-device/
+
 **Discord Group:** https://discord.gg/evilcrowrf
 
 **Summary:**
@@ -55,6 +59,20 @@ You can invite me for a coffee to further develop Low-Cost hacking devices. If y
 	* Power management
 	* Other Sketches
 4. Evil Crow RF V2 Support
+
+# NOTE
+
+**Currently, the latest version cannot be compiled due to issues with third-party libraries. Rewriting the firmware will take some time.**
+
+**In the meantime, you can flash EvilCrow-RFv2.ino.esp32.bin, located in firmware/v1.3.2/EvilCrow-RFv2/. There is no difference between versions v1.3.2 and v1.3.3.**
+
+**You can also use alternative firmware options, for example:**
+
+* https://github.com/h-RAT/EvilCrowRF_Custom_Firmware_CC1101_FlipperZero
+
+* https://github.com/realdaveblanch/Evil-Crow-RF-v2-Custom-ROM/
+
+* https://github.com/tutejshy-bit/tut-rf
 
 # Disclaimer
 
