@@ -4,7 +4,6 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <AsyncElegantOTA.h>
-#include <SPIFFSEditor.h>
 #include <EEPROM.h>
 #include "SPIFFS.h"
 #include "SPI.h"
