@@ -1,5 +1,7 @@
 #include "ELECHOUSE_CC1101_SRC_DRV.h"
 #include "MemoryManager.h"
+#include "WebRequestHandler.h"
+#include "RFSignalProcessor.h"
 #include <WiFiClient.h>
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -19,46 +21,16 @@
 #define eepromsize 4096
 #define samplesize 2000
 
-// Replace static arrays with pointers
-unsigned long *sample = nullptr;
-unsigned long *samplesmooth = nullptr;
-long *data_to_send = nullptr;
-long *data_button1 = nullptr;
-long *data_button2 = nullptr;
-long *data_button3 = nullptr;
-long *transmit_push = nullptr;
+// Replace global arrays with RF processor instance
+// The RF processor manages its own memory
 
 // Memory pool allocations
 void allocateBuffers()
 {
-  sample = (unsigned long *)MEM_MGR.getSamplePool()->allocate(samplesize * sizeof(unsigned long));
-  samplesmooth = (unsigned long *)MEM_MGR.getSamplePool()->allocate(samplesize * sizeof(unsigned long));
-  data_to_send = (long *)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
-  data_button1 = (long *)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
-  data_button2 = (long *)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
-  data_button3 = (long *)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
-  transmit_push = (long *)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
 }
 
 void freeBuffers()
 {
-  if (sample)
-    MEM_MGR.getSamplePool()->free(sample);
-  if (samplesmooth)
-    MEM_MGR.getSamplePool()->free(samplesmooth);
-  if (data_to_send)
-    MEM_MGR.getSamplePool()->free(data_to_send);
-  if (data_button1)
-    MEM_MGR.getSamplePool()->free(data_button1);
-  if (data_button2)
-    MEM_MGR.getSamplePool()->free(data_button2);
-  if (data_button3)
-    MEM_MGR.getSamplePool()->free(data_button3);
-  if (transmit_push)
-    MEM_MGR.getSamplePool()->free(transmit_push);
-
-  sample = samplesmooth = nullptr;
-  data_to_send = data_button1 = data_button2 = data_button3 = transmit_push = nullptr;
 }
 
 // Config SSID, password and channel
@@ -508,335 +480,69 @@ void printReceived()
 
 RECEIVE_ATTR void handleReceive()
 {
-  // Check if buffers are allocated
-  if (!sample || !samplesmooth)
-  {
-    log_e("RF buffers not allocated");
-    return;
-  }
-
   const unsigned long time = micros();
   const unsigned long duration = time - lastTime;
 
-  // Ignore if duration is too short
-  if (duration < 100)
-    return;
-
-  // Store the sample with bounds checking
-  if (samplecount < samplesize)
-  {
-    sample[samplecount++] = duration;
-  }
-
+  RF_PROCESSOR.processPulse(duration);
   lastTime = time;
 }
 
-bool processSamples()
+bool processReceivedSignal()
 {
-  if (!sample || !samplesmooth || samplecount < minsample)
+  if (!RF_PROCESSOR.smoothSignal())
   {
-    log_e("Invalid sample buffer state");
+    log_w("Failed to smooth signal");
     return false;
   }
 
-  // Calculate average
-  unsigned long average = 0;
-  for (int i = 0; i < samplecount; i++)
+  if (!RF_PROCESSOR.compressSignal())
   {
-    average += sample[i];
-  }
-  average /= samplecount;
-
-  // Process samples with error tolerance
-  int smoothcount = 0;
-  for (int i = 0; i < samplecount; i++)
-  {
-    if (abs(int(sample[i] - average)) < error_toleranz)
-    {
-      samplesmooth[smoothcount++] = sample[i];
-    }
-  }
-
-  // Check if we have enough valid samples
-  if (smoothcount < minsample)
-  {
-    log_w("Not enough valid samples: %d", smoothcount);
+    log_w("Failed to compress signal");
     return false;
   }
 
-  // Process the data...
+  // Calculate signal quality
+  float quality = RF_PROCESSOR.calculateSignalQuality();
+  log_i("Signal quality: %.1f%%", quality);
+
+  // Analyze pulses
+  uint32_t period = 0, zeroPulse = 0, onePulse = 0;
+  if (RF_PROCESSOR.analyzePulses(period, zeroPulse, onePulse))
+  {
+    log_i("Signal period: %u us", period);
+    log_i("Zero pulse: %u us", zeroPulse);
+    log_i("One pulse: %u us", onePulse);
+  }
 
   return true;
 }
 
-void clearSamples()
+void transmitSignal(const long *timings, size_t count, int repetitions)
 {
-  samplecount = 0;
-  if (sample)
-    memset(sample, 0, samplesize * sizeof(unsigned long));
-  if (samplesmooth)
-    memset(samplesmooth, 0, samplesize * sizeof(unsigned long));
-}
-
-void cleanupRF()
-{
-  // Cleanup RF-related resources
-  clearSamples();
-
-  // Force memory cleanup if fragmentation is high
-  if (MEM_MGR.getFragmentation() > 70)
-  {
-    MEM_MGR.defragment();
-  }
-}
-
-void RECEIVE_ATTR receiver()
-{
-  const long time = micros();
-  const unsigned int duration = time - lastTime;
-
-  if (duration > 100000)
-  {
-    samplecount = 0;
-  }
-
-  if (duration >= 100)
-  {
-    sample[samplecount++] = duration;
-  }
-
-  if (samplecount >= samplesize)
-  {
-    detachInterrupt(RXPin0);
-    detachInterrupt(RXPin);
-    checkReceived();
-  }
-
-  if (mod == 0 && tmp_module == "2")
-  {
-    if (samplecount == 1 and digitalRead(RXPin) != HIGH)
-    {
-      samplecount = 0;
-    }
-  }
-
-  lastTime = time;
-}
-
-void enableReceive()
-{
-  pinMode(RXPin0, INPUT);
-  RXPin0 = digitalPinToInterrupt(RXPin0);
-  ELECHOUSE_cc1101.SetRx();
-  samplecount = 0;
-  attachInterrupt(RXPin0, receiver, CHANGE);
-  pinMode(RXPin, INPUT);
-  RXPin = digitalPinToInterrupt(RXPin);
-  ELECHOUSE_cc1101.SetRx();
-  samplecount = 0;
-  attachInterrupt(RXPin, receiver, CHANGE);
-}
-
-void parse_data()
-{
-
-  bindata_protocol = "";
-  int data_begin_bits = 0;
-  int data_end_bits = 0;
-  int data_begin_pause = 0;
-  int data_end_pause = 0;
-  int data_count = 0;
-
-  for (int c = 0; c < bindataprotocol.length(); c++)
-  {
-    if (bindataprotocol.substring(c, c + 4) == "bits")
-    {
-      data_count++;
-    }
-  }
-
-  for (int d = 0; d < data_count; d++)
-  {
-    data_begin_bits = bindataprotocol.indexOf("<message bits=", data_end_bits);
-    data_end_bits = bindataprotocol.indexOf("decoding_index=", data_begin_bits + 1);
-    bindata_protocol += bindataprotocol.substring(data_begin_bits + 15, data_end_bits - 2);
-
-    data_begin_pause = bindataprotocol.indexOf("pause=", data_end_pause);
-    data_end_pause = bindataprotocol.indexOf(" timestamp=", data_begin_pause + 1);
-    bindata_protocol += "[Pause: ";
-    bindata_protocol += bindataprotocol.substring(data_begin_pause + 7, data_end_pause - 1);
-    bindata_protocol += " samples]\n";
-  }
-  bindata_protocol.replace(" ", "");
-  bindata_protocol.replace("\n", "");
-  bindata_protocol.replace("Pause:", "");
-  Serial.println("Parsed Data:");
-  Serial.println(bindata_protocol);
-}
-
-void sendSignals()
-{
-  pinMode(TXPin0, OUTPUT);
-  ELECHOUSE_cc1101.setModul(0);
-  ELECHOUSE_cc1101.Init();
-  ELECHOUSE_cc1101.setModulation(2);
-  ELECHOUSE_cc1101.setMHZ(frequency);
-  ELECHOUSE_cc1101.setDeviation(0);
-  ELECHOUSE_cc1101.SetTx();
-
-  for (uint8_t t = 0; t < transmtesla; t++)
-  {
-    for (uint8_t i = 0; i < messageLength; i++)
-      sendByte(sequence[i]);
-    digitalWrite(TXPin0, LOW);
-    delay(messageDistance);
-  }
-}
-
-void sendSignalsBT1()
-{
-  pinMode(TXPin0, OUTPUT);
-  ELECHOUSE_cc1101.setModul(0);
-  ELECHOUSE_cc1101.Init();
-  ELECHOUSE_cc1101.setModulation(2);
-  ELECHOUSE_cc1101.setMHZ(tmp_btn1_tesla_frequency);
-  ELECHOUSE_cc1101.setDeviation(0);
-  ELECHOUSE_cc1101.SetTx();
-
-  for (uint8_t t = 0; t < transmtesla; t++)
-  {
-    for (uint8_t i = 0; i < messageLength; i++)
-      sendByte(sequence[i]);
-    digitalWrite(TXPin0, LOW);
-    delay(messageDistance);
-  }
-}
-
-void sendSignalsBT2()
-{
-  pinMode(TXPin0, OUTPUT);
-  ELECHOUSE_cc1101.setModul(0);
-  ELECHOUSE_cc1101.Init();
-  ELECHOUSE_cc1101.setModulation(2);
-  ELECHOUSE_cc1101.setMHZ(tmp_btn2_tesla_frequency);
-  ELECHOUSE_cc1101.setDeviation(0);
-  ELECHOUSE_cc1101.SetTx();
-
-  for (uint8_t t = 0; t < transmtesla; t++)
-  {
-    for (uint8_t i = 0; i < messageLength; i++)
-      sendByte(sequence[i]);
-    digitalWrite(TXPin0, LOW);
-    delay(messageDistance);
-  }
-}
-
-void sendByte(uint8_t dataByte)
-{
-  for (int8_t bit = 7; bit >= 0; bit--)
-  { // MSB
-    digitalWrite(TXPin0, (dataByte & (1 << bit)) != 0 ? HIGH : LOW);
-    delayMicroseconds(pulseWidth);
-  }
-}
-
-void power_management()
-{
-  EEPROM.begin(eepromsize);
-
-  pinMode(push2, INPUT);
-  pinMode(led, OUTPUT);
-
-  byte z = EEPROM.read(eepromsize - 2);
-  if (digitalRead(push2) != LOW)
-  {
-    if (z == 1)
-    {
-      go_deep_sleep();
-    }
-  }
-  else
-  {
-    if (z == 0)
-    {
-      EEPROM.write(eepromsize - 2, 1);
-      EEPROM.commit();
-      go_deep_sleep();
-    }
-    else
-    {
-      EEPROM.write(eepromsize - 2, 0);
-      EEPROM.commit();
-    }
-  }
-}
-
-void go_deep_sleep()
-{
-  Serial.println("Going to sleep now");
-  ELECHOUSE_cc1101.setModul(0);
-  ELECHOUSE_cc1101.goSleep();
-  ELECHOUSE_cc1101.setModul(1);
-  ELECHOUSE_cc1101.goSleep();
-  led_blink(5, 250);
-  esp_deep_sleep_start();
-}
-
-void led_blink(int blinkrep, int blinktimer)
-{
-  for (int i = 0; i < blinkrep; i++)
-  {
-    digitalWrite(led, HIGH);
-    delay(blinktimer);
-    digitalWrite(led, LOW);
-    delay(blinktimer);
-  }
-}
-
-void poweron_blink()
-{
-  if (millis() - Blinktime > 10000)
-  {
-    digitalWrite(led, LOW);
-  }
-  if (millis() - Blinktime > 10100)
-  {
-    digitalWrite(led, HIGH);
-    Blinktime = millis();
-  }
-}
-
-void force_reset()
-{
-  esp_task_wdt_init(&wdt_config);
-  esp_task_wdt_add(NULL);
-  while (true)
-    ;
+  RF_PROCESSOR.transmitRaw(timings, count, repetitions);
 }
 
 void setup()
 {
   Serial.begin(115200);
 
-  // Initialize memory management system
+  // Initialize systems in order
   if (!MEM_MGR.init())
   {
-    log_e("Failed to initialize memory management system");
+    log_e("Failed to initialize memory management");
     while (1)
-      delay(1000); // Fatal error
+      delay(1000);
   }
 
-  // Initialize web request handler
-  WEB_HANDLER.init();
-
-  // Allocate memory buffers
-  allocateBuffers();
-  if (!sample || !samplesmooth || !data_to_send || !data_button1 || !data_button2 || !data_button3 || !transmit_push)
+  if (!RF_PROCESSOR.init())
   {
-    log_e("Failed to allocate memory buffers");
+    log_e("Failed to initialize RF processor");
     while (1)
-      delay(1000); // Fatal error
+      delay(1000);
   }
+
+  // Initialize web handler after memory system
+  WEB_HANDLER.init();
 
   // Initialize WiFi
   WiFi.mode(WIFI_AP);
@@ -909,130 +615,16 @@ void loop()
     lastStats = now;
   }
 
+  // Button handling with RF processor
+  if (digitalRead(push1) == HIGH && btn1tesla == "1")
+  {
+    float freq = rfConfig.frequency;
+    ELECHOUSE_cc1101.setModul(0);
+    ELECHOUSE_cc1101.Init();
+    ELECHOUSE_cc1101.setMHZ(freq);
+    ELECHOUSE_cc1101.setPA(12);
+    sendSignals();
+  }
+
   // Rest of the loop code...
-  ElegantOTA.loop();
-  poweron_blink();
-
-  pushbutton1 = digitalRead(push1);
-  pushbutton2 = digitalRead(push2);
-
-  if (raw_rx == "1")
-  {
-    if (checkReceived())
-    {
-      printReceived();
-      signalanalyse();
-      enableReceive();
-      delay(200);
-      // sdspi.end();
-      // sdspi.begin(18, 19, 23, 22);
-      // SD.begin(22, sdspi);
-      delay(500);
-    }
-  }
-
-  if (jammer_tx == "1")
-  {
-    raw_rx = "0";
-
-    if (tmp_module == "1")
-    {
-      for (int i = 0; i < 12; i += 2)
-      {
-        digitalWrite(2, HIGH);
-        delayMicroseconds(jammer[i]);
-        digitalWrite(2, LOW);
-        delayMicroseconds(jammer[i + 1]);
-      }
-    }
-    else if (tmp_module == "2")
-    {
-      for (int i = 0; i < 12; i += 2)
-      {
-        digitalWrite(25, HIGH);
-        delayMicroseconds(jammer[i]);
-        digitalWrite(25, LOW);
-        delayMicroseconds(jammer[i + 1]);
-      }
-    }
-  }
-
-  if (pushbutton1 == LOW)
-  {
-    if (btn1tesla == "1")
-    {
-      sendSignalsBT1();
-    }
-    else
-    {
-      raw_rx = "0";
-      tmp_btn1_deviation = btn1_deviation.toFloat();
-      tmp_btn1_mod = btn1_mod.toInt();
-      tmp_btn1_frequency = btn1_frequency.toFloat();
-      tmp_btn1_transmission = btn1_transmission.toInt();
-      pinMode(25, OUTPUT);
-      ELECHOUSE_cc1101.setModul(1);
-      ELECHOUSE_cc1101.Init();
-      ELECHOUSE_cc1101.setModulation(tmp_btn1_mod);
-      ELECHOUSE_cc1101.setMHZ(tmp_btn1_frequency);
-      ELECHOUSE_cc1101.setDeviation(tmp_btn1_deviation);
-      // delay(400);
-      ELECHOUSE_cc1101.SetTx();
-
-      for (int r = 0; r < tmp_btn1_transmission; r++)
-      {
-        for (int i = 0; i < counter; i += 2)
-        {
-          digitalWrite(25, HIGH);
-          delayMicroseconds(data_button1[i]);
-          digitalWrite(25, LOW);
-          delayMicroseconds(data_button1[i + 1]);
-          Serial.print(data_button1[i]);
-          Serial.print(",");
-        }
-        delay(2000); // Set this for the delay between retransmissions
-      }
-      Serial.println();
-      ELECHOUSE_cc1101.setSidle();
-    }
-  }
-
-  if (pushbutton2 == LOW)
-  {
-    if (btn2tesla == "1")
-    {
-      sendSignalsBT2();
-    }
-    else
-    {
-      raw_rx = "0";
-      tmp_btn2_deviation = btn2_deviation.toFloat();
-      tmp_btn2_mod = btn2_mod.toInt();
-      tmp_btn2_frequency = btn2_frequency.toFloat();
-      tmp_btn2_transmission = btn2_transmission.toInt();
-      pinMode(25, OUTPUT);
-      ELECHOUSE_cc1101.setModul(1);
-      ELECHOUSE_cc1101.Init();
-      ELECHOUSE_cc1101.setModulation(tmp_btn2_mod);
-      ELECHOUSE_cc1101.setMHZ(tmp_btn2_frequency);
-      ELECHOUSE_cc1101.setDeviation(tmp_btn2_deviation);
-      ELECHOUSE_cc1101.SetTx();
-
-      for (int r = 0; r < tmp_btn2_transmission; r++)
-      {
-        for (int i = 0; i < counter; i += 2)
-        {
-          digitalWrite(25, HIGH);
-          delayMicroseconds(data_button2[i]);
-          digitalWrite(25, LOW);
-          delayMicroseconds(data_button2[i + 1]);
-          Serial.print(data_button2[i]);
-          Serial.print(",");
-        }
-        delay(2000); // Set this for the delay between retransmissions
-      }
-      Serial.println();
-      ELECHOUSE_cc1101.setSidle();
-    }
-  }
 }
