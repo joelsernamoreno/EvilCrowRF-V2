@@ -1,0 +1,192 @@
+/* Attack-specific styles */
+#attack-config {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#attack-status {
+    max-width: 800px;
+    margin: 2rem auto 0;
+}
+
+.sweep-settings {
+    display: none;
+}
+
+#jam-type[value="1"] ~ .sweep-settings {
+    display: block;
+}
+
+.signal-strength-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.signal-strength-value {
+    font-weight: 500;
+}
+
+/* Protocol-specific styling */
+[data-attack-type="MOUSEJACKING"] .mousejacking-options,
+[data-attack-type="ROLLJAM"] .rolljam-options,
+[data-attack-type="BRUTEFORCE"] .bruteforce-options,
+[data-attack-type="DIP_SWITCH"] .dipswitch-options,
+[data-attack-type="JAMMING"] .jamming-options {
+    display: block;
+}
+
+.protocol-options {
+    display: none;
+}
+
+/* Status indicators */
+.status-indicator {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 8px;
+}
+
+.status-running {
+    background-color: var(--success-color);
+}
+
+.status-stopped {
+    background-color: var(--danger-color);
+}
+
+.status-waiting {
+    background-color: var(--warning-color);
+}
+
+/* Advanced options toggle */
+.advanced-options {
+    border-top: 1px solid var(--border-color);
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+}
+
+.advanced-toggle {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+.advanced-toggle::before {
+    content: '';
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid currentColor;
+    margin-right: 8px;
+    transform: rotate(-90deg);
+    transition: transform 0.3s;
+}
+
+.advanced-toggle.open::before {
+    transform: rotate(0);
+}
+
+.advanced-content {
+    display: none;
+    margin-top: 1rem;
+}
+
+.advanced-toggle.open + .advanced-content {
+    display: block;
+}
+
+/* Attack type badges */
+.attack-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.attack-badge.mousejacking {
+    background-color: #E3F2FD;
+    color: #1565C0;
+}
+
+.attack-badge.rolljam {
+    background-color: #F3E5F5;
+    color: #7B1FA2;
+}
+
+.attack-badge.bruteforce {
+    background-color: #FFEBEE;
+    color: #C62828;
+}
+
+.attack-badge.dipswitch {
+    background-color: #E8F5E9;
+    color: #2E7D32;
+}
+
+.attack-badge.jamming {
+    background-color: #FFF3E0;
+    color: #EF6C00;
+}
+
+/* Real-time monitoring widgets */
+.monitoring-widget {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.widget-title {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+}
+
+.widget-value {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.widget-trend {
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+.trend-up {
+    color: var(--success-color);
+}
+
+.trend-down {
+    color: var(--danger-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .form-actions button {
+        width: 100%;
+    }
+
+    .monitoring-widget {
+        margin-bottom: 1rem;
+    }
+}

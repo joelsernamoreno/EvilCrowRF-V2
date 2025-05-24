@@ -2,10 +2,11 @@
 #include "MemoryManager.h"
 #include "WebRequestHandler.h"
 #include "RFSignalProcessor.h"
+#include "AttackManager.h"
 #include <WiFiClient.h>
 #include <WiFi.h>
 #include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
+#include <ESPAsyncWebSrv.h>
 #include <ElegantOTA.h>
 #include "esp_task_wdt.h"
 #define DEST_FS_USES_SD
@@ -495,23 +496,51 @@ bool processReceivedSignal()
     return false;
   }
 
-  if (!RF_PROCESSOR.compressSignal())
-  {
-    log_w("Failed to compress signal");
-    return false;
-  }
-
   // Calculate signal quality
   float quality = RF_PROCESSOR.calculateSignalQuality();
   log_i("Signal quality: %.1f%%", quality);
 
-  // Analyze pulses
-  uint32_t period = 0, zeroPulse = 0, onePulse = 0;
-  if (RF_PROCESSOR.analyzePulses(period, zeroPulse, onePulse))
+  // Analyze spectral properties
+  RFSignalProcessor::SpectralInfo spectrum;
+  if (RF_PROCESSOR.analyzeSpectrum(spectrum))
   {
-    log_i("Signal period: %u us", period);
-    log_i("Zero pulse: %u us", zeroPulse);
-    log_i("One pulse: %u us", onePulse);
+    log_i("Spectral Analysis:");
+    log_i("  Dominant Freq: %.1f Hz", spectrum.dominantFreq);
+    log_i("  SNR: %.1f dB", spectrum.signalToNoise);
+    log_i("  Bandwidth: %.1f Hz", spectrum.bandwidth);
+    log_i("  Symbol Rate: %u baud", spectrum.symbolRate);
+  }
+
+  // Detect patterns
+  RFSignalProcessor::PatternInfo pattern;
+  if (RF_PROCESSOR.detectPattern(pattern))
+  {
+    log_i("Pattern Analysis:");
+    log_i("  Length: %u bits", pattern.length);
+    log_i("  Repeats: %u", pattern.repeats);
+    log_i("  Confidence: %.1f%%", pattern.confidence * 100);
+  }
+
+  // Identify protocol
+  RFSignalProcessor::ProtocolInfo protocol;
+  if (RF_PROCESSOR.identifyProtocol(protocol))
+  {
+    log_i("Protocol Identified: %s", protocol.name);
+    log_i("  Base Unit: %u us", protocol.baseUnit);
+    log_i("  Min Repeats: %u", protocol.minRepeats);
+  }
+
+  // Compress and analyze pulses
+  if (RF_PROCESSOR.compressSignal())
+  {
+    uint32_t period = 0, zeroPulse = 0, onePulse = 0;
+    if (RF_PROCESSOR.analyzePulses(period, zeroPulse, onePulse))
+    {
+      log_i("Pulse Analysis:");
+      log_i("  Period: %u us", period);
+      log_i("  Zero Pulse: %u us", zeroPulse);
+      log_i("  One Pulse: %u us", onePulse);
+    }
   }
 
   return true;
@@ -557,31 +586,9 @@ void setup()
   pinMode(push1, INPUT);
   pinMode(push2, INPUT);
 
-  // Setup web routes with memory-managed handlers
-  controlserver.on("/settx", HTTP_POST, [](AsyncWebServerRequest *request)
-                   {
-        raw_rx = "0"; // Keep legacy state variable for now
-        WEB_HANDLER.handleTxRequest(request); });
+  // Add attack routes
+  addAttackRoutes(controlserver);
 
-  controlserver.on("/setrx", HTTP_POST, [](AsyncWebServerRequest *request)
-                   { WEB_HANDLER.handleRxRequest(request); });
-
-  controlserver.on("/settxbinary", HTTP_POST, [](AsyncWebServerRequest *request)
-                   {
-        raw_rx = "0"; // Keep legacy state variable for now
-        WEB_HANDLER.handleBinaryRequest(request); });
-
-  controlserver.on("/settxtesla", HTTP_POST, [](AsyncWebServerRequest *request)
-                   {
-        raw_rx = "0"; // Keep legacy state variable for now
-        WEB_HANDLER.handleTeslaRequest(request); });
-
-  controlserver.on("/setjammer", HTTP_POST, [](AsyncWebServerRequest *request)
-                   {
-        raw_rx = "0"; // Keep legacy state variable for now
-        WEB_HANDLER.handleJammerRequest(request); });
-
-  // Static file handlers remain unchanged
   controlserver.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
                    { request->send(SD, "/HTML/index.html", "text/html"); });
 

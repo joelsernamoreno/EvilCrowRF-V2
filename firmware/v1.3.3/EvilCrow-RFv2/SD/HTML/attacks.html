@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EvilCrowRF V2 - Attack Control</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/attacks.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EvilCrowRF V2 - Attack Control</h1>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="attacks.html" class="active">Attacks</a></li>
+                    <li><a href="monitor.html">Monitor</a></li>
+                    <li><a href="logs.html">Logs</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="attack-config">
+                <h2>Attack Configuration</h2>
+                <form id="attack-form">
+                    <div class="form-group">
+                        <label for="attack-type">Attack Type:</label>
+                        <select id="attack-type" name="type" required>
+                            <option value="MOUSEJACKING">Mousejacking</option>
+                            <option value="ROLLJAM">Rolljam</option>
+                            <option value="BRUTEFORCE">Bruteforce</option>
+                            <option value="DIP_SWITCH">DIP Switch</option>
+                            <option value="JAMMING">Jamming</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="frequency">Frequency (MHz):</label>
+                        <input type="number" id="frequency" name="frequency" step="0.01" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="modulation">Modulation:</label>
+                        <select id="modulation" name="modulation" required>
+                            <option value="2">2-FSK</option>
+                            <option value="0">ASK/OOK</option>
+                            <option value="3">4-FSK</option>
+                            <option value="4">MSK</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic parameters section -->
+                    <div id="dynamic-params"></div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="start-attack" class="btn-primary">Start Attack</button>
+                        <button type="button" id="stop-attack" class="btn-danger" disabled>Stop Attack</button>
+                    </div>
+                </form>
+            </section>
+
+            <section id="attack-status" class="hidden">
+                <h2>Attack Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <label>Status:</label>
+                        <span id="current-status">Idle</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Current Action:</label>
+                        <span id="current-action">None</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Success Rate:</label>
+                        <span id="success-rate">0%</span>
+                    </div>
+                    <div class="status-item">
+                        <label>Signal Strength:</label>
+                        <div class="signal-meter">
+                            <div id="signal-strength" class="signal-bar"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress-container">
+                    <label>Progress:</label>
+                    <div class="progress-bar">
+                        <div id="attack-progress" class="progress-fill"></div>
+                    </div>
+                    <span id="progress-text">0%</span>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="js/attacks.js"></script>
+</body>
+</html>

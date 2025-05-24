@@ -1,0 +1,102 @@
+<![CDATA[<html>
+<head>
+    <title>Weather Station Attack</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="../style.css">
+    <script src="../lib.js"></script>
+    <script src="../javascript.js"></script>
+</head>
+<body>
+<nav id='menu'>
+  <input type='checkbox' id='responsive-menu' onclick='updatemenu()'><label></label>
+  <ul>
+    <li><a href='/'>Home</a></li>
+    <li><a class='dropdown-arrow'>Config</a>
+      <ul class='sub-menus'>
+        <li><a href='/txconfig'>RAW TX Config</a></li>
+        <li><a href='/txbinary'>Binary TX Config</a></li>
+        <li><a href='/rxconfig'>RX Config</a></li>
+        <li><a href='/btnconfig'>Button TX Config</a></li>
+      </ul>
+    </li>
+    <li><a class='dropdown-arrow'>RX Log</a>
+      <ul class='sub-menus'>
+        <li><a href='/viewlog'>RX Logs</a></li>
+        <li><a href='/delete'>Delete Logs</a></li>
+        <li><a href='/downloadlog'>Download Logs</a></li>
+        <li><a href='/cleanspiffs'>Clean SPIFFS</a></li>
+      </ul>
+    </li>
+    <li><a class='dropdown-arrow'>RF Attacks</a>
+      <ul class='sub-menus'>
+        <li><a href='/attack/smarthome'>Smart Home Attack</a></li>
+        <li><a href='/attack/weatherstation'>Weather Station Attack</a></li>
+        <li><a href='/attack/vehiclediag'>Vehicle Diagnostics Attack</a></li>
+        <li><a href='/attack/keyfob'>Key Fob Extension Attack</a></li>
+        <li><a href='/attack/rfremote'>RF Remote Override Attack</a></li>
+        <li><a href='/attack/doorbell'>Wireless Doorbell Attack</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+<br>
+<br>
+<form action="/attack/weatherstation" method="post" id="config" target="iframe">
+    <p>Module: </p>
+    <label class="custom-select" for="module">
+        <select name="module" form="config" id="module">
+            <option value="1">Module 1</option>
+            <option value="2">Module 2</option>
+        </select>
+    </label>
+    <hr>
+    <p>Target Station Type:</p>
+    <label class="custom-select" for="stationType">
+        <select name="stationType" form="config" id="stationType">
+            <option value="acurite">AcuRite</option>
+            <option value="oregon">Oregon Scientific</option>
+            <option value="ambient">Ambient Weather</option>
+            <option value="lacrosse">La Crosse</option>
+        </select>
+    </label>
+    <hr>
+    <p>Frequency (MHz):</p>
+    <input type="number" step="0.01" name="frequency" value="433.92">
+    <hr>
+    <p>Attack Type:</p>
+    <label class="custom-select" for="attackType">
+        <select name="attackType" form="config" id="attackType">
+            <option value="spoof">Data Spoofing</option>
+            <option value="jamming">Signal Jamming</option>
+            <option value="intercept">Data Interception</option>
+        </select>
+    </label>
+    <hr>
+    <div id="spoofData">
+        <p>Temperature (°C):</p>
+        <input type="number" step="0.1" name="temperature" value="25.0">
+        <p>Humidity (%):</p>
+        <input type="number" step="1" name="humidity" value="50">
+        <p>Pressure (hPa):</p>
+        <input type="number" step="0.1" name="pressure" value="1013.2">
+        <p>Wind Speed (km/h):</p>
+        <input type="number" step="0.1" name="windSpeed" value="10.0">
+        <hr>
+    </div>
+    <p>Duration (seconds):</p>
+    <input type="number" name="duration" value="10">
+    <hr>
+    <div class="grid-container">
+        <input type="submit" value="Start Attack">
+        <input type="submit" value="Stop Attack" formaction="/attack/control?action=stop">
+    </div>
+</form>
+<div id="statusContainer">
+    <p>Attack Status: <span id="attackStatus">Idle</span></p>
+    <p>Progress: <span id="attackProgress">0%</span></p>
+    <p>Last Result: <span id="attackResult">-</span></p>
+</div>
+<br>
+<iframe style="visibility: hidden;" name="iframe"></iframe>
+</body>
+</html>]]>

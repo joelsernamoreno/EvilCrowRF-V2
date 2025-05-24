@@ -1,0 +1,19 @@
+Arduino IDE Settings for Evil Crow RF v1.3.3:
+
+Board: ESP32 Dev Module
+Flash Size: 4MB (32Mb)
+CPU Frequency: 80MHz (WiFi/BT)
+Flash Mode: QIO
+Partition Scheme: Default 4MB with spiffs
+Core Debug Level: None
+PSRAM: Disabled
+
+Required Libraries:
+1. AsyncTCP (https://github.com/me-no-dev/AsyncTCP.git)
+2. ESP32 board package v3.0.5
+3. ESP32-targz
+4. SPIFFSEditor
+5. ESPAsyncWebServer
+6. ESP32-Arduino-ElegantOTA (not AsyncElegantOTA)
+
+Note: AsyncTCP is already configured with CONFIG_ASYNC_TCP_USE_WDT = 0 in AsyncTCP.h
