@@ -1,4 +1,5 @@
 #include "ELECHOUSE_CC1101_SRC_DRV.h"
+#include "MemoryManager.h"
 #include <WiFiClient.h> 
 #include <WiFi.h>
 #include <AsyncTCP.h>
@@ -18,20 +19,38 @@
 #define eepromsize 4096
 #define samplesize 2000
 
-#define SD_SCLK 18
-#define SD_MISO 19
-#define SD_MOSI 23
-#define SD_SS   22
+// Replace static arrays with pointers
+unsigned long* sample = nullptr;
+unsigned long* samplesmooth = nullptr;
+long* data_to_send = nullptr;
+long* data_button1 = nullptr;
+long* data_button2 = nullptr;
+long* data_button3 = nullptr;
+long* transmit_push = nullptr;
 
-SPIClass sdspi(VSPI);
+// Memory pool allocations
+void allocateBuffers() {
+    sample = (unsigned long*)MEM_MGR.getSamplePool()->allocate(samplesize * sizeof(unsigned long));
+    samplesmooth = (unsigned long*)MEM_MGR.getSamplePool()->allocate(samplesize * sizeof(unsigned long));
+    data_to_send = (long*)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
+    data_button1 = (long*)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
+    data_button2 = (long*)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
+    data_button3 = (long*)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
+    transmit_push = (long*)MEM_MGR.getSamplePool()->allocate(2000 * sizeof(long));
+}
 
-#if defined(ESP8266)
-    #define RECEIVE_ATTR ICACHE_RAM_ATTR
-#elif defined(ESP32)
-    #define RECEIVE_ATTR IRAM_ATTR
-#else
-    #define RECEIVE_ATTR
-#endif
+void freeBuffers() {
+    if (sample) MEM_MGR.getSamplePool()->free(sample);
+    if (samplesmooth) MEM_MGR.getSamplePool()->free(samplesmooth);
+    if (data_to_send) MEM_MGR.getSamplePool()->free(data_to_send);
+    if (data_button1) MEM_MGR.getSamplePool()->free(data_button1);
+    if (data_button2) MEM_MGR.getSamplePool()->free(data_button2);
+    if (data_button3) MEM_MGR.getSamplePool()->free(data_button3);
+    if (transmit_push) MEM_MGR.getSamplePool()->free(transmit_push);
+    
+    sample = samplesmooth = nullptr;
+    data_to_send = data_button1 = data_button2 = data_button3 = transmit_push = nullptr;
+}
 
 // Config SSID, password and channel
 const char* ssid = "Evil Crow RF v2";  // Enter your SSID here
@@ -56,16 +75,8 @@ int RXPin0 = 4;
 int TXPin0 = 2;
 int Gdo0 = 25;
 const int minsample = 30;
-unsigned long sample[samplesize];
-unsigned long samplesmooth[samplesize];
-int samplecount;
 static unsigned long lastTime = 0;
 String transmit = "";
-long data_to_send[2000];
-long data_button1[2000];
-long data_button2[2000];
-long data_button3[2000];
-long transmit_push[2000];
 String tmp_module;
 String tmp_frequency;
 String tmp_xmlname;
@@ -422,6 +433,75 @@ void printReceived(){
   appendFile(SD, "/logs.txt", "\n", "\n");
 }
 
+RECEIVE_ATTR void handleReceive() {
+    // Check if buffers are allocated
+    if (!sample || !samplesmooth) {
+        log_e("RF buffers not allocated");
+        return;
+    }
+    
+    const unsigned long time = micros();
+    const unsigned long duration = time - lastTime;
+    
+    // Ignore if duration is too short
+    if (duration < 100) return;
+    
+    // Store the sample with bounds checking
+    if (samplecount < samplesize) {
+        sample[samplecount++] = duration;
+    }
+    
+    lastTime = time;
+}
+
+bool processSamples() {
+    if (!sample || !samplesmooth || samplecount < minsample) {
+        log_e("Invalid sample buffer state");
+        return false;
+    }
+    
+    // Calculate average
+    unsigned long average = 0;
+    for (int i = 0; i < samplecount; i++) {
+        average += sample[i];
+    }
+    average /= samplecount;
+    
+    // Process samples with error tolerance
+    int smoothcount = 0;
+    for (int i = 0; i < samplecount; i++) {
+        if (abs(int(sample[i] - average)) < error_toleranz) {
+            samplesmooth[smoothcount++] = sample[i];
+        }
+    }
+    
+    // Check if we have enough valid samples
+    if (smoothcount < minsample) {
+        log_w("Not enough valid samples: %d", smoothcount);
+        return false;
+    }
+    
+    // Process the data...
+    
+    return true;
+}
+
+void clearSamples() {
+    samplecount = 0;
+    if (sample) memset(sample, 0, samplesize * sizeof(unsigned long));
+    if (samplesmooth) memset(samplesmooth, 0, samplesize * sizeof(unsigned long));
+}
+
+void cleanupRF() {
+    // Cleanup RF-related resources
+    clearSamples();
+    
+    // Force memory cleanup if fragmentation is high
+    if (MEM_MGR.getFragmentation() > 70) {
+        MEM_MGR.defragment();
+    }
+}
+
 void RECEIVE_ATTR receiver() {
   const long time = micros();
   const unsigned int duration = time - lastTime;
@@ -613,8 +693,25 @@ void setup() {
   Serial.begin(38400);
   power_management();
 
-  SPIFFS.begin(formatOnFail);
-
+  // Initialize memory management system
+  if (!MEM_MGR.init()) {
+      log_e("Failed to initialize memory management system");
+      while(1) delay(1000); // Fatal error
+  }
+  
+  // Allocate memory buffers
+  allocateBuffers();
+  if (!sample || !samplesmooth || !data_to_send || !data_button1 || !data_button2 || !data_button3 || !transmit_push) {
+      log_e("Failed to allocate memory buffers");
+      while(1) delay(1000); // Fatal error
+  }
+  
+  // Initialize SPIFFS
+  if (!SPIFFS.begin(true)) {
+      log_e("SPIFFS initialization failed");
+      while(1) delay(1000);
+  }
+  
   readConfigWiFi(SPIFFS,"/configwifi.txt");
   ssid_new = tmp_config1;
   password_new = tmp_config2;
@@ -1009,7 +1106,7 @@ void setup() {
         if (bindata_protocol.substring(i, i+1)=="["){
           data_to_send[count_binconvert]= bindata_protocol.substring(i+1,bindata_protocol.indexOf("]",i)).toInt();
           lastbit_convert="0";
-          i+= bindata_protocol.substring(i,bindata_protocol.indexOf("]",i)).length();
+          i+= bindata_protocol.substring(i, bindata_protocol.indexOf("]",i)).length();
         }else{
           data_to_send[count_binconvert]+=samplepulse;
         }
@@ -1385,6 +1482,81 @@ void signalanalyse(){
   appendFile(SD, "/logs.txt", NULL, "<br>\n");
   appendFile(SD, "/logs.txt", "-------------------------------------------------------\n", "<br>");
   return;
+}
+
+bool prepareTransmission(const char* rawData, long* buffer, size_t maxLen) {
+    if (!buffer) {
+        log_e("Invalid transmission buffer");
+        return false;
+    }
+    
+    // Clear the buffer
+    memset(buffer, 0, maxLen * sizeof(long));
+    
+    // Parse the raw data into timings
+    size_t idx = 0;
+    char* str = strdup(rawData);  // Create a copy for strtok
+    char* token = strtok(str, ",");
+    
+    while (token && idx < maxLen) {
+        buffer[idx++] = atol(token);
+        token = strtok(NULL, ",");
+    }
+    
+    free(str);  // Clean up
+    
+    if (idx == 0) {
+        log_e("No valid timing data parsed");
+        return false;
+    }
+    
+    return true;
+}
+
+void transmitSignal(const long* buffer, size_t len, int repetitions) {
+    if (!buffer || len == 0) {
+        log_e("Invalid transmission data");
+        return;
+    }
+    
+    // Check memory state before transmission
+    size_t freeHeap = MEM_MGR.getFreeHeap();
+    if (freeHeap < 10240) {  // 10KB minimum
+        log_w("Low memory before transmission: %u bytes", freeHeap);
+        MEM_MGR.defragment();
+    }
+    
+    // Perform the transmission
+    ELECHOUSE_cc1101.setMHZ(rfConfig.frequency);
+    ELECHOUSE_cc1101.SetTx();
+    
+    for (int i = 0; i < repetitions; i++) {
+        for (size_t j = 0; j < len && buffer[j] != 0; j += 2) {
+            digitalWrite(TXPin0, HIGH);
+            delayMicroseconds(buffer[j]);
+            digitalWrite(TXPin0, LOW);
+            delayMicroseconds(buffer[j + 1]);
+        }
+    }
+    
+    ELECHOUSE_cc1101.SetRx();
+}
+
+void handleButtonPress(int button) {
+    ButtonConfig* config = (button == 1) ? &btn1Config : &btn2Config;
+    long* buffer = (button == 1) ? data_button1 : data_button2;
+    
+    if (!buffer) {
+        log_e("Button %d buffer not allocated", button);
+        return;
+    }
+    
+    if (!prepareTransmission(config->rawdata, buffer, 2000)) {
+        log_e("Failed to prepare button %d transmission", button);
+        return;
+    }
+    
+    transmitSignal(buffer, 2000, config->transmission);
 }
 
 void loop() {
