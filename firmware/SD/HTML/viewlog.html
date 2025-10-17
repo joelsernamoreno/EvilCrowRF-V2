@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>EvilCrow-RF</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="style.css">
+    <script src="javascript.js"></script>
+    <style>
+        .view-container {
+            margin: 20px auto;
+            max-width: 900px;
+        }
+
+        #logsContainer {
+            width: 100%;
+            height: 60vh;
+            background-color: rgba(0,0,0,0.8);
+            color: var(--secondary, #00f2ff);
+            border: 1px solid var(--primary, #00f2ff);
+            border-radius: 5px;
+            padding: 10px;
+            overflow: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            scrollbar-width: thin; 
+            scrollbar-color: var(--primary, #00f2ff) rgba(0,0,0,0.5);
+        }
+
+        #logsContainer::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        #logsContainer::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.5);
+            border-radius: 4px;
+        }
+
+        #logsContainer::-webkit-scrollbar-thumb {
+            background-color: var(--primary, #00f2ff);
+            border-radius: 4px;
+            border: 2px solid rgba(0,0,0,0.5);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .button-container button {
+            padding: 10px 20px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background: linear-gradient(135deg, var(--error, #cc0022), #ff4444);
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .button-container button:hover {
+            opacity: 0.85;
+        }
+    </style>
+</head>
+<body>
+    <div id="global-toast" class="toast-container"></div>
+
+    <nav id="menu">
+        <input type="checkbox" id="responsive-menu">
+        <label for="responsive-menu"></label>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/rxconfig">RX Config</a></li>
+            <li><a href="/viewlog">Log Viewer</a></li>
+            <li><a href="/txconfig">TX Config</a></li>
+            <li><a href="/config">Config</a></li>
+        </ul>
+    </nav>
+
+    <div class="rf-logo">Log Viewer</div>
+
+    <div class="view-container">
+        <div id="logsContainer">
+            <div id="logsText">Loading log...</div>
+        </div>
+
+        <div class="button-container">
+            <button type="button" onclick="deleteLog()">Delete Log</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadLogs() {
+            try {
+                const response = await fetch('/logs');
+                if (!response.ok) throw new Error('Failed to fetch logs');
+                const text = await response.text();
+                const container = document.getElementById('logsContainer');
+                const logsText = document.getElementById('logsText');
+                const selection = window.getSelection();
+                const selectedText = selection.toString();
+                if (logsText.textContent !== text) {
+                    logsText.textContent = text;
+                    container.scrollTop = container.scrollHeight;
+                    if (selectedText) {
+                        const range = document.createRange();
+                        range.selectNodeContents(logsText);
+                        selection.removeAllRanges();
+                        selection.addRange(range);
+                    }
+                }
+            } catch (error) {
+                document.getElementById('logsText').textContent = 'Error loading logs: ' + error;
+                console.error(error);
+            }
+        }
+
+        function deleteLog() {
+            if (!confirm("Are you sure you want to delete the log?")) return;
+
+            fetch('/delete', { method: 'POST' })
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to delete log');
+                    showMessage('success', 'Log deleted successfully');
+                    document.getElementById('logsText').textContent = '';
+                })
+                .catch(error => {
+                    showMessage('error', 'Error deleting log');
+                    console.error(error);
+                });
+        }
+
+        function showMessage(type, text) {
+            const container = document.getElementById('global-toast');
+            const toast = document.createElement('div');
+            toast.className = `toast-message ${type}`;
+            toast.textContent = text;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLogs();
+            setInterval(loadLogs, 5000);
+            const menuLinks = document.querySelectorAll('#menu a');
+            const responsiveMenu = document.getElementById('responsive-menu');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        responsiveMenu.checked = false;
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

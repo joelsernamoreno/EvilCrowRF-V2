@@ -1,0 +1,147 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>EvilCrow-RF</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="stylesheet" href="style.css">
+  <script src="javascript.js"></script>
+</head>
+
+<body>
+  <div id="global-toast" class="toast-container"></div>
+
+  <!-- Menú -->
+  <nav id="menu">
+    <input type="checkbox" id="responsive-menu">
+    <label for="responsive-menu"></label>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/rxconfig">RX Config</a></li>
+      <li><a href="/viewlog">Log Viewer</a></li>
+      <li><a href="/txconfig">TX Config</a></li>
+      <li><a href="/config">Config</a></li>
+    </ul>
+  </nav>
+
+  <div class="rf-logo">RX CONFIGURATION</div>
+
+  <div class="view-container">
+    <form id="rxForm">
+      <div class="form-group">
+        <label>Module:</label>
+        <select name="module" id="module" class="styled-select">
+          <option value="1">Module 1</option> 
+          <option value="2">Module 2</option> 
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Modulation:</label>
+        <select name="mod" id="mod" class="styled-select">
+          <option value="0">2-FSK</option> 
+          <option value="2">ASK/OOK</option> 
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Frequency:</label>
+        <input type="text" name="frequency" id="frequency" class="single-line-input" placeholder="Enter frequency">
+      </div>
+
+      <div class="form-group">
+        <label>Rx Bandwidth:</label>
+        <input type="text" name="setrxbw" id="setrxbw" class="single-line-input" placeholder="Enter Rx bandwidth">
+      </div>
+
+      <div class="form-group">
+        <label>Deviation:</label>
+        <input type="text" name="deviation" id="deviation" class="single-line-input" placeholder="Enter deviation">
+      </div>
+
+      <div class="form-group">
+        <label>Data Rate:</label>
+        <input type="text" name="datarate" id="datarate" class="single-line-input" placeholder="Enter data rate">
+      </div>
+
+      <input type="radio" name="configmodule" value="4" hidden checked>
+
+      <div class="button-container">
+        <button type="button" class="button-submit" onclick="applyRX()">Start RX</button>
+        <button type="button" class="button-stop" onclick="stopRX()">Stop RX</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function showMessage(type, text) {
+      const container = document.getElementById('global-toast');
+      const toast = document.createElement('div');
+      toast.className = `toast-message ${type}`;
+      toast.textContent = text;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    async function applyRX() {
+      const form = document.getElementById('rxForm');
+      const data = new URLSearchParams(new FormData(form));
+
+      const freq = form.frequency.value.trim();
+      if (!freq) {
+        showMessage('error', 'Frequency is required');
+        return;
+      }
+
+      try {
+        const response = await fetch('/setrx', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: data
+        });
+
+        const result = await response.text();
+        if (response.ok) {
+          showMessage('success', 'RX configuration applied successfully');
+        } else {
+          showMessage('error', 'Error applying RX configuration: ' + result);
+        }
+      } catch (error) {
+        showMessage('error', 'Error sending RX configuration');
+        console.error(error);
+      }
+    }
+
+    async function stopRX() {
+      if (!confirm('Are you sure you want to stop reception?')) return;
+      try {
+        const response = await fetch('/stoprx', { method: 'POST' });
+        const data = await response.text();
+        if (response.ok) {
+          showMessage('success', 'RX stopped');
+        } else {
+          showMessage('error', 'Error stopping RX: ' + data);
+        }
+      } catch (error) {
+        showMessage('error', 'Error communicating with device');
+        console.error(error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuLinks = document.querySelectorAll('#menu a');
+      const responsiveMenu = document.getElementById('responsive-menu');
+      menuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth < 768) {
+            responsiveMenu.checked = false;
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+

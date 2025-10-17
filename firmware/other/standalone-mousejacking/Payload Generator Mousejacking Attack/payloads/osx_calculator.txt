@@ -1,8 +1,0 @@
-GUI SPACE
-DELAY 200
-STRING Terminal
-ENTER
-DELAY 500
-STRING open -n -a calculator
-DELAY 500
-ENTER

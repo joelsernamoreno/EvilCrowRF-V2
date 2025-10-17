@@ -1,0 +1,102 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>EvilCrow-RF</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="stylesheet" href="style.css">
+    <script src="javascript.js"></script>
+</head>
+<body>
+    <div id="global-toast" class="toast-container"></div>
+    <nav id="menu">
+        <input type="checkbox" id="responsive-menu">
+        <label for="responsive-menu"></label>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/rxconfig">RX Config</a></li>
+            <li><a href="/viewlog">Log Viewer</a></li>
+            <li><a href="/txconfig">TX Config</a></li>
+            <li><a href="/config">Config</a></li>
+
+        </ul>
+        </nav>
+
+    <div class="rf-logo">EvilCrow-RF</div>
+
+    <div class="view-container">
+        <div class="stat-container">
+            <div class="stat-group">
+                <strong>Connection Status: <span class="status-indicator status-offline"></span></strong>
+            </div>
+            <div class="stat-group">
+                <strong>Firmware:</strong> <span id="firmware">v1.0</span>
+            </div>
+            <div class="stat-group">
+                <strong>Connected to:</strong> <span id="ssid">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>IP Address:</strong> <span id="ipaddress">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>Uptime:</strong> <span id="uptime">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>CPU Temperature:</strong> <span id="temperature">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>CPU Core 0 Frequency:</strong> <span id="cpu0">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>CPU Core 1 Frequency:</strong> <span id="cpu1">N/A</span>
+            </div>
+            
+            <div class="section-header">MicroSD Storage</div>
+            
+            <div class="stat-group">
+                <strong>SD Card Present:</strong> <span id="sdcard_present">No</span>
+            </div>
+            <div class="stat-group">
+                <strong>SD Card Total Size:</strong> <span id="sdcard_size_gb">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>SD Card Free Space:</strong> <span id="sdcard_free_gb">N/A</span>
+            </div>
+         
+            <div class="section-header">Memory Information</div>
+            
+            <div class="stat-group">
+                <strong>Free SPIFFS Memory:</strong> <span id="freespiffs">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>Total RAM:</strong> <span id="totalram">N/A</span>
+            </div>
+            <div class="stat-group">
+                <strong>Free RAM:</strong> <span id="freeram">N/A</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            if (typeof setupNavigation === 'function') {
+                setupNavigation();
+            }
+            
+            if (typeof checkConnection === 'function') {
+                checkConnection();
+            }
+            
+            if (typeof checkConnection === 'function') {
+                setInterval(checkConnection, 5000);
+            }
+            
+            isNavigating = false;
+            document.body.classList.remove('page-loading');
+        });
+    </script>
+</body>
+</html>

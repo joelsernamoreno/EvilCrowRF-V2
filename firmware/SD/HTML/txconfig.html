@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>EvilCrow-RF</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="stylesheet" href="style.css">
+  <script src="javascript.js"></script>
+  <style>
+    .view-container { margin: 20px auto; max-width: 900px; }
+    .form-group { margin-bottom: 15px; }
+    .button-container { display: flex; gap: 10px; margin-top: 10px; }
+    h3, .section-header { font-size: 1.3em; font-weight: bold; color: #00f2ff; margin-bottom: 10px; }
+    hr { border: 0; border-top: 2px solid rgba(0, 242, 255, 0.5); margin: 30px 0; }
+  </style>
+</head>
+
+<body>
+  <div id="global-toast" class="toast-container"></div>
+
+  <!-- Menú -->
+  <nav id="menu">
+    <input type="checkbox" id="responsive-menu">
+    <label for="responsive-menu"></label>
+    <ul>
+      <li><a href="/">Home</a></li>
+      <li><a href="/rxconfig">RX Config</a></li>
+      <li><a href="/viewlog">Log Viewer</a></li>
+      <li><a href="/txconfig">TX Config</a></li>
+      <li><a href="/config">Config</a></li>
+    </ul>
+  </nav>
+
+  <div class="rf-logo">TX CONFIGURATION</div>
+
+  <div class="view-container">
+    <form id="txRawForm">
+      <div class="section-header">Transmit RAW Data</div>
+      <div class="form-group">
+        <label>Module:</label>
+        <select name="module" id="module" class="styled-select">
+          <option value="1">Module 1</option>
+          <option value="2">Module 2</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Modulation:</label>
+        <select name="mod" id="mod" class="styled-select">
+          <option value="0">2-FSK</option>
+          <option value="2">ASK/OOK</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Frequency:</label>
+        <input type="text" name="frequency" id="frequency" class="single-line-input" placeholder="Enter frequency">
+      </div>
+
+      <div class="form-group">
+        <label>RAW Data:</label>
+        <input type="text" name="rawdata" id="rawdata" class="single-line-input" placeholder="Enter raw data">
+      </div>
+
+      <div class="form-group">
+        <label>Deviation:</label>
+        <input type="text" name="deviation" id="deviation" class="single-line-input" placeholder="Enter deviation">
+      </div>
+
+      <div class="button-container">
+        <button type="button" class="button-submit" onclick="transmitRaw()">Transmit</button>
+      </div>
+    </form>
+
+    <hr>
+
+    <!-- JAMMER -->
+    <form id="jammerForm">
+      <div class="section-header">Jammer</div>
+      <div class="form-group">
+        <label>Module:</label>
+        <select name="module" id="jammerModule" class="styled-select">
+          <option value="1">Module 1</option>
+          <option value="2">Module 2</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Frequency:</label>
+        <input type="text" name="frequency" id="jammerFrequency" class="single-line-input" placeholder="Enter frequency">
+      </div>
+
+      <div class="form-group">
+        <label>Power:</label>
+        <input type="text" name="power" id="jammerPower" class="single-line-input" placeholder="Enter power">
+      </div>
+
+      <div class="button-container">
+        <button type="button" class="button-submit" onclick="startJammer()">Start</button>
+        <button type="button" class="button-stop" onclick="stopJammer()">Stop</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    function showMessage(type, text) {
+      const container = document.getElementById('global-toast');
+      const toast = document.createElement('div');
+      toast.className = `toast-message ${type}`;
+      toast.textContent = text;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 4000);
+    }
+
+    async function transmitRaw() {
+      const form = document.getElementById('txRawForm');
+      const data = new URLSearchParams(new FormData(form));
+      if (!form.frequency.value.trim() || !form.rawdata.value.trim()) {
+        showMessage('error', 'Frequency and RAW Data are required');
+        return;
+      }
+      try {
+        const response = await fetch('/settx', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: data
+        });
+        const result = await response.text();
+        response.ok ? showMessage('success', 'TX RAW data transmitted successfully') :
+                      showMessage('error', 'Error transmitting RAW data: ' + result);
+      } catch (error) {
+        showMessage('error', 'Error sending TX RAW data');
+        console.error(error);
+      }
+    }
+
+    async function startJammer() {
+      const form = document.getElementById('jammerForm');
+      const data = new URLSearchParams(new FormData(form));
+      try {
+        const response = await fetch('/setjammer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: data
+        });
+        const result = await response.text();
+        response.ok ? showMessage('success', 'Jammer started successfully') :
+                      showMessage('error', 'Error starting jammer: ' + result);
+      } catch (error) {
+        showMessage('error', 'Error sending jammer command');
+        console.error(error);
+      }
+    }
+
+    async function stopJammer() {
+      try {
+        const response = await fetch('/stopjammer', { method: 'POST' });
+        const result = await response.text();
+        response.ok ? showMessage('success', 'Jammer stopped') :
+                      showMessage('error', 'Error stopping jammer: ' + result);
+      } catch (error) {
+        showMessage('error', 'Error sending stop jammer command');
+        console.error(error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const menuLinks = document.querySelectorAll('#menu a');
+      const responsiveMenu = document.getElementById('responsive-menu');
+      menuLinks.forEach(link => {
+        link.addEventListener('click', () => {
+          if (window.innerWidth < 768) responsiveMenu.checked = false;
+        });
+      });
+    });
+  </script>
+</body>
+</html>
+
