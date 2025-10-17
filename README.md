@@ -111,7 +111,7 @@ The basic firmware allows to receive and transmit signals. You can configure the
 9. Open Arduino IDE
 10. Go to File - Preferences. Locate the field "Additional Board Manager URLs:" Add "https://espressif.github.io/arduino-esp32/package_esp32_index.json" without quotes. Click "Ok"
 11. Select Tools - Board - Boards Manager. Search for "esp32". Install "esp32 by Espressif system version 3.3.2". Click "Close".
-12. Open the EvilCrowRF-V2/firmware/v1.3.3/EvilCrow-RFv2/EvilCrow-RFv2.ino sketch
+12. Open the EvilCrowRF-V2/firmware/firmware/firmware.ino sketch
 13. Select Tools:
     * Board - "ESP32 Dev Module".
     * Flash Size - "4MB (32Mb)".
