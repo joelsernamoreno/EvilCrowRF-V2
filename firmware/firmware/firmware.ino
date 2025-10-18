@@ -53,7 +53,8 @@ int datarate;
 float frequency;
 float setrxbw;
 int power_jammer;
-byte jammer[11] = {0xff,0xff,};
+byte jammer[] = { 0xff, 0xff };
+const size_t jammer_len = sizeof(jammer) / sizeof(jammer[0]);
 long data_to_send[2000];
 
 // Other variables
@@ -186,7 +187,7 @@ void handleStats(AsyncWebServerRequest *request) {
   }
 
   float cardSizeGB = cardSize / (1024.0 * 1024.0 * 1024.0);
-  float usedGB = usedBytes / (1024.0 * 1024.0 * 1024.0);
+  //float usedGB = usedBytes / (1024.0 * 1024.0 * 1024.0);
   float freeGB = freeBytes / (1024.0 * 1024.0 * 1024.0);
 
   String json = "{";
@@ -306,7 +307,7 @@ void signalanalyse(){
 
   int signalanz=0;
   int timingdelay[signalstorage];
-  float pulse[signalstorage];
+  //float pulse[signalstorage];
   long signaltimings[signalstorage*2];
   int signaltimingscount[signalstorage];
   long signaltimingssum[signalstorage];
@@ -712,9 +713,8 @@ void loop() {
     }
   }
   if(jammer_tx == "1") {
-    
     if (tmp_module == "1") {
-      for (int i = 0; i<12; i+=2){
+      for (int i = 0; i + 1 < jammer_len; i += 2){
         digitalWrite(tx_pin1,HIGH);
         delayMicroseconds(jammer[i]);
         digitalWrite(tx_pin1,LOW);
@@ -722,7 +722,7 @@ void loop() {
       }
     }
     else if (tmp_module == "2") {
-      for (int i = 0; i<12; i+=2){
+      for (int i = 0; i + 1 < jammer_len; i += 2){
         digitalWrite(tx_pin2,HIGH);
         delayMicroseconds(jammer[i]);
         digitalWrite(tx_pin2,LOW);

@@ -143,11 +143,11 @@ Check your SD card size. It is recommended to use a small card. 32GB or smaller 
 3. Connect your laptop to the same Wi-Fi network.
 4. Open a browser and access the web panel: http://evilcrow-rf.local/
 
-**Note:** If you cannot access the web panel, use the IP address assigned to Evil Crow Cable Wind or follow below steps **only if you are running Linux OS:**
+**Note:** If you cannot access the web panel, use the IP address assigned to Evil Crow RF v2 or follow below steps **only if you are running Linux OS:**
  * check if avahi-deamon is installed and running on your PC. You can do this with executing "sudo systemctl status avahi-daemon" in terminal
  * If service is not running, install it using your package manager (apt, yum, dnf, Packman, rpm,...)
  * After successful installation, start avahi-daemon service with "sudo systemctl start avahi-daemon && sudo systemctl enable avahi-daemon"
- * In case cable-wind.local is still not reachable, use http://"IP address", where "IP address" is IP assigned to Evil Crow RF v2.
+ * In case evilcrow-rf.local is still not reachable, use http://"IP address", where "IP address" is IP assigned to Evil Crow RF v2.
 
 ## Home
 
